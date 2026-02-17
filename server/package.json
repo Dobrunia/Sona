@@ -15,8 +15,7 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
-    "@apollo/server": "^4.11.3",
-    "@apollo/server/express4": "^4.11.3",
+    "@apollo/server": "^5.4.0",
     "@prisma/client": "^5.18.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
