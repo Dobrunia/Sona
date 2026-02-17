@@ -23,6 +23,8 @@ cd ./server
 cp .env.example .env
 ```
 
+Fill in required auth and S3 settings in `/Users/dobruniakostrigin/front-end/Sona/server/.env`.
+
 3. Install dependencies:
 
 ```bash

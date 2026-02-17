@@ -8,7 +8,18 @@
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "src",
+    "paths": {
+      "@core/*": ["core/*"],
+      "@db/*": ["db/*"],
+      "@auth/*": ["auth/*"],
+      "@graphql/*": ["graphql/*"],
+      "@storage/*": ["storage/*"],
+      "@media/*": ["media/*"],
+      "@rate-limit/*": ["rate-limit/*"],
+      "@ws/*": ["ws/*"]
+    }
   },
   "include": ["src"]
 }

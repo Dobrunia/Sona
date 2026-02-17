@@ -4,13 +4,17 @@ import express from "express";
 import cors from "cors";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
-import { typeDefs, resolvers } from "./schema.js";
-import { buildContext } from "./context.js";
-import { attachPresenceServer } from "./ws.js";
+import { typeDefs, resolvers } from "@graphql/schema.js";
+import { buildContext } from "@auth/context.js";
+import { attachPresenceServer } from "@ws/ws.js";
+import { config, assertConfig } from "@core/config.js";
+import { prisma } from "@db/prisma.js";
+import { formatGraphQLError } from "@core/errors.js";
 
-const PORT = Number(process.env.PORT ?? 4000);
+const PORT = config.port;
 
 async function start() {
+  assertConfig();
   const app = express();
   const server = http.createServer(app);
 
@@ -19,7 +23,8 @@ async function start() {
 
   const apollo = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers,
+    formatError: formatGraphQLError
   });
 
   await apollo.start();
@@ -32,7 +37,7 @@ async function start() {
     })
   );
 
-  attachPresenceServer(server);
+  attachPresenceServer(server, prisma);
 
   server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

@@ -1,0 +1,29 @@
+{
+  "name": "music-service-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.11.8",
+    "@vue/apollo-composable": "^4.0.0",
+    "graphql": "^16.9.0",
+    "pinia": "^2.2.2",
+    "vue": "^3.5.4",
+    "vuetify": "^3.7.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@vitejs/plugin-vue": "^5.1.2",
+    "typescript": "^5.4.5",
+    "vite": "^5.4.8",
+    "vue-tsc": "^2.1.6"
+  }
+}

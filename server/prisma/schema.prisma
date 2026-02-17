@@ -14,8 +14,9 @@ model User {
   avatar    String?
   createdAt DateTime @default(now())
 
-  tracks Track[]
-  likes  Like[]
+  tracks        Track[]
+  likes         Like[]
+  refreshTokens RefreshToken[]
 }
 
 model Track {
@@ -48,4 +49,17 @@ model Like {
   track Track @relation(fields: [trackId], references: [id])
 
   @@unique([userId, trackId])
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique
+  userId    Int
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
