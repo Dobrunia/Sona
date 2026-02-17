@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+
+  tracks Track[]
+  likes  Like[]
+}
+
+model Track {
+  id           Int      @id @default(autoincrement())
+  title        String
+  artist       String?
+  fileKey      String
+  coverKey     String?
+  duration     Int
+  fileSize     Int
+  coverSize    Int?
+  playCount    Int      @default(0)
+  createdAt    DateTime @default(now())
+  uploadedById Int
+
+  uploadedBy User   @relation(fields: [uploadedById], references: [id])
+  likes      Like[]
+
+  @@index([title])
+  @@index([artist])
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  trackId   Int
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  track Track @relation(fields: [trackId], references: [id])
+
+  @@unique([userId, trackId])
+}
