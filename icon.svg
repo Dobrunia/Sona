@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sona icon">
+  <!-- Use with CSS: svg { color: #000 } -->
+  <defs>
+    <linearGradient id="sonaGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="currentColor" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="currentColor" stop-opacity="0.70"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer badge -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="currentColor" stroke-width="24" opacity="0.9"/>
+
+  <!-- Sound-wave "S" mark -->
+  <path
+    d="M352 164
+       C322 136 276 126 236 134
+       C194 142 168 170 168 206
+       C168 252 214 266 256 276
+       C302 287 344 302 344 346
+       C344 388 306 416 256 416
+       C210 416 174 398 150 370"
+    fill="none"
+    stroke="url(#sonaGlow)"
+    stroke-width="44"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#soft)"
+  />
+
+  <!-- Small “pulse” accents -->
+  <path d="M392 206 C412 232 412 280 392 306" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round" opacity="0.55"/>
+  <path d="M120 206 C100 232 100 280 120 306" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round" opacity="0.55"/>
+</svg>
