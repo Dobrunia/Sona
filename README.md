@@ -29,7 +29,7 @@ cp .env.example .env
 pnpm install
 ```
 
-4. Generate Prisma client and run migrations:
+4. Generate Prisma client and sync schema:
 
 ```bash
 pnpm run prisma:generate
