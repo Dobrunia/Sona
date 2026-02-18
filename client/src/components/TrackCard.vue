@@ -1,22 +1,26 @@
 <template>
   <article class="card">
-    <div class="cover">
+    <div class="cover" @click="play">
       <img v-if="track.coverUrl" :src="track.coverUrl" :alt="track.title" />
       <div v-else class="fallback">
         <img src="/icon.svg" alt="Sona" />
       </div>
     </div>
-    <div class="info">
+    <div class="body">
       <div class="title">{{ track.title }}</div>
       <div class="artist">{{ track.artist || "Unknown" }}</div>
     </div>
     <div class="actions">
-      <v-btn
-        :icon="liked ? 'mdi-heart' : 'mdi-heart-outline'"
-        variant="text"
-        @click="toggleLike"
-      ></v-btn>
-      <v-btn icon="mdi-play" variant="text" @click="play"></v-btn>
+      <button class="icon-btn" @click="toggleLike">
+        <v-icon
+          :icon="liked ? 'mdi-heart' : 'mdi-heart-outline'"
+          :color="liked ? '#ff6b4a' : undefined"
+          size="20"
+        />
+      </button>
+      <button class="icon-btn" @click="play">
+        <v-icon icon="mdi-play" size="20" />
+      </button>
     </div>
   </article>
 </template>
@@ -112,21 +116,27 @@ function play() {
 <style scoped>
 .card {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 44px 1fr auto;
   align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  gap: var(--s-sm);
+  padding: var(--s-sm);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  transition: box-shadow 0.15s;
+}
+
+.card:hover {
+  box-shadow: var(--shadow);
 }
 
 .cover {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
   overflow: hidden;
-  background: linear-gradient(145deg, rgba(17, 17, 17, 0.9), rgba(255, 107, 74, 0.7));
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .cover img {
@@ -140,25 +150,52 @@ function play() {
   height: 100%;
   display: grid;
   place-items: center;
-  background: linear-gradient(145deg, rgba(17, 17, 17, 0.9), rgba(255, 107, 74, 0.7));
+  background: linear-gradient(135deg, #222, var(--c-accent));
 }
 
 .fallback img {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
+}
+
+.body {
+  min-width: 0;
 }
 
 .title {
   font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .artist {
-  font-size: 13px;
-  color: #5f5f5f;
+  font-size: 12px;
+  color: var(--c-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .actions {
-  display: inline-flex;
-  gap: 6px;
+  display: flex;
+  gap: var(--s-xs);
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s;
+}
+
+.icon-btn:hover {
+  background: var(--c-bg);
 }
 </style>

@@ -1,10 +1,10 @@
 <template>
   <v-app>
     <app-header />
-    <v-main>
-      <v-container class="app-container" fluid>
+    <v-main class="main">
+      <div class="col">
         <router-view />
-      </v-container>
+      </div>
     </v-main>
     <player-bar />
     <app-nav />
@@ -18,14 +18,14 @@ import PlayerBar from "@/components/PlayerBar.vue";
 </script>
 
 <style scoped>
-.app-container {
-  max-width: 1200px;
-  padding: 24px 20px 140px;
+.main {
+  padding-top: var(--header-h) !important;
+  padding-bottom: calc(var(--player-h) + var(--nav-h) + var(--s-md));
 }
 
-@media (min-width: 960px) {
-  .app-container {
-    padding: 32px 48px 160px;
-  }
+.col {
+  max-width: var(--col-width);
+  margin: 0 auto;
+  padding: var(--s-lg) var(--s-md);
 }
 </style>

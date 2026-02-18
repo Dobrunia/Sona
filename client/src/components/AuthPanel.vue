@@ -1,24 +1,27 @@
 <template>
   <div>
     <div v-if="auth.user" class="profile">
-      <div class="avatar">
-        <img v-if="auth.user.avatar" :src="auth.user.avatar" alt="avatar" />
-        <img v-else src="/icon.svg" alt="Sona" />
-      </div>
+      <img
+        v-if="auth.user.avatar"
+        :src="auth.user.avatar"
+        alt="avatar"
+        class="avatar"
+      />
+      <img v-else src="/icon.svg" alt="Sona" class="avatar" />
       <div>
         <div class="email">{{ auth.user.email }}</div>
-        <div class="name">{{ auth.user.name || "" }}</div>
+        <div class="name" v-if="auth.user.name">{{ auth.user.name }}</div>
       </div>
     </div>
     <div v-else class="login">
       <p>Войди через Google, чтобы продолжить.</p>
       <div class="google-button" :id="googleButtonId"></div>
-      <p v-if="googleUnavailable" class="hint">
-        Google кнопка не загрузилась. Проверь `VITE_GOOGLE_CLIENT_ID` и перезапусти dev-сервер.
+      <p v-if="googleUnavailable" class="warn">
+        Google кнопка не загрузилась. Проверь VITE_GOOGLE_CLIENT_ID.
       </p>
     </div>
-    <div class="actions">
-      <v-btn v-if="auth.user" variant="text" :loading="loading" @click="logout">Выйти</v-btn>
+    <div class="actions" v-if="auth.user">
+      <button class="logout-btn" :disabled="loading" @click="logout">Выйти</button>
     </div>
   </div>
 </template>
@@ -44,13 +47,11 @@ async function mountGoogle() {
   googleUnavailable.value = !ok;
 }
 
-onMounted(() => {
-  mountGoogle();
-});
+onMounted(() => { mountGoogle(); });
 
 onUnmounted(() => {
-  const container = document.getElementById(googleButtonId);
-  if (container) container.innerHTML = "";
+  const el = document.getElementById(googleButtonId);
+  if (el) el.innerHTML = "";
 });
 
 async function logout() {
@@ -68,53 +69,62 @@ async function logout() {
 <style scoped>
 .profile {
   display: flex;
-  gap: 14px;
+  gap: var(--s-sm);
   align-items: center;
 }
 
 .avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  overflow: hidden;
-  background: #f2f2f2;
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   object-fit: cover;
+  background: var(--c-bg);
 }
 
 .email {
   font-weight: 600;
+  font-size: 14px;
 }
 
 .name {
-  font-size: 13px;
-  color: #6b6b6b;
+  font-size: 12px;
+  color: var(--c-muted);
 }
 
 .login p {
-  margin: 0 0 12px;
+  margin: 0 0 var(--s-sm);
   font-size: 13px;
-  color: #6b6b6b;
+  color: var(--c-muted);
 }
 
 .google-button {
-  margin-bottom: 12px;
   min-height: 42px;
 }
 
-.hint {
-  margin: 0;
+.warn {
+  color: var(--c-accent);
   font-size: 12px;
-  color: #ff6b4a;
 }
 
 .actions {
-  margin-top: 12px;
+  margin-top: var(--s-md);
   display: flex;
   justify-content: flex-end;
+}
+
+.logout-btn {
+  background: none;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  padding: var(--s-xs) var(--s-sm);
+  font-family: var(--font);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--c-text);
+  transition: background 0.15s;
+}
+
+.logout-btn:hover {
+  background: var(--c-bg);
 }
 </style>

@@ -1,20 +1,16 @@
 <template>
-  <v-container class="auth-page" fluid>
-    <v-card class="auth-card" elevation="0">
-      <v-card-text>
-        <div class="brand">
-          <v-avatar size="48">
-            <img src="/icon.svg" alt="Sona" />
-          </v-avatar>
-          <div>
-            <h1>Sona</h1>
-            <p>Авторизуйся, чтобы продолжить.</p>
-          </div>
+  <div class="page">
+    <div class="card">
+      <div class="brand">
+        <img src="/icon.svg" alt="Sona" class="logo" />
+        <div>
+          <h1>Sona</h1>
+          <p>Авторизуйся, чтобы продолжить.</p>
         </div>
-        <auth-panel @done="noop" />
-      </v-card-text>
-    </v-card>
-  </v-container>
+      </div>
+      <auth-panel @done="noop" />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -24,37 +20,42 @@ function noop() {}
 </script>
 
 <style scoped>
-.auth-page {
-  min-height: 100vh;
+.page {
+  min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 32px 20px;
-  background: radial-gradient(circle at top, #ffffff 0%, #f6f6f4 55%, #f2efe9 100%);
+  padding: var(--s-lg) var(--s-md);
+  background: var(--c-bg);
 }
 
-.auth-card {
-  width: min(480px, 100%);
-  border-radius: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  padding: 12px;
+.card {
+  width: min(420px, 100%);
+  background: var(--c-surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--c-border);
+  padding: var(--s-lg);
 }
 
 .brand {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 14px;
+  display: flex;
   align-items: center;
-  margin-bottom: 16px;
+  gap: var(--s-sm);
+  margin-bottom: var(--s-lg);
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
 }
 
 h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
 }
 
 p {
-  margin: 4px 0 0;
-  color: #6b6b6b;
-  font-size: 14px;
+  margin: var(--s-xs) 0 0;
+  color: var(--c-muted);
+  font-size: 13px;
 }
 </style>

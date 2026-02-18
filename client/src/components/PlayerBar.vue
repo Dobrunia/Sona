@@ -1,36 +1,48 @@
 <template>
-  <v-sheet class="player" elevation="0">
+  <div class="player">
     <audio ref="audioEl" preload="metadata"></audio>
-    <div class="track">
-      <v-avatar size="56" class="cover">
+
+    <div class="left">
+      <div class="cover">
         <img v-if="current?.coverUrl" :src="current.coverUrl" :alt="current.title" />
         <img v-else src="/icon.svg" alt="Sona" />
-      </v-avatar>
-      <div>
-        <div class="title">{{ current?.title ?? "Не выбрано" }}</div>
-        <div class="artist">{{ current?.artist ?? "Добавьте трек" }}</div>
+      </div>
+      <div class="info">
+        <span class="title">{{ current?.title ?? "Не выбрано" }}</span>
+        <span class="artist">{{ current?.artist ?? "" }}</span>
       </div>
     </div>
-    <div class="controls">
-      <v-btn icon="mdi-skip-previous" variant="text"></v-btn>
-      <v-btn
-        :icon="player.isPlaying ? 'mdi-pause' : 'mdi-play'"
-        variant="flat"
+
+    <div class="center">
+      <button class="ctrl" @click="player.toggle" :disabled="!current">
+        <v-icon :icon="player.isPlaying ? 'mdi-pause' : 'mdi-play'" size="22" />
+      </button>
+    </div>
+
+    <div class="right">
+      <v-slider
+        v-model="progress"
+        hide-details
+        :min="0"
+        :max="100"
+        class="slider"
         color="primary"
-        class="play"
-        :disabled="!current"
-        @click="player.toggle"
-      ></v-btn>
-      <v-btn icon="mdi-skip-next" variant="text"></v-btn>
-    </div>
-    <div class="meta">
-      <v-slider v-model="progress" hide-details :min="0" :max="100" class="progress"></v-slider>
-      <div class="volume">
-        <v-icon icon="mdi-volume-high"></v-icon>
-        <v-slider v-model="volume" hide-details :min="0" :max="100"></v-slider>
+        track-color="rgba(0,0,0,0.08)"
+      />
+      <div class="vol">
+        <v-icon icon="mdi-volume-high" size="16" />
+        <v-slider
+          v-model="volume"
+          hide-details
+          :min="0"
+          :max="100"
+          class="slider"
+          color="primary"
+          track-color="rgba(0,0,0,0.08)"
+        />
       </div>
     </div>
-  </v-sheet>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -109,65 +121,126 @@ onMounted(() => {
 
 <style scoped>
 .player {
-  position: sticky;
-  bottom: 56px;
-  z-index: 10;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: var(--nav-h);
+  z-index: 15;
+  height: var(--player-h);
   display: grid;
-  gap: 12px;
-  padding: 12px 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  background: #ffffff;
+  grid-template-columns: 1fr auto 2fr;
+  align-items: center;
+  gap: var(--s-md);
+  padding: 0 var(--s-md);
+  background: var(--c-surface);
+  border-top: 1px solid var(--c-border);
 }
 
-.track {
+.left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--s-sm);
+  min-width: 0;
+}
+
+.cover {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--c-bg);
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .title {
   font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .artist {
-  font-size: 13px;
-  color: #5f5f5f;
+  font-size: 12px;
+  color: var(--c-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.controls {
-  display: inline-flex;
+.center {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
 }
 
-.play {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-}
-
-.meta {
+.ctrl {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--c-text);
+  color: var(--c-surface);
+  cursor: pointer;
   display: grid;
-  gap: 8px;
+  place-items: center;
+  transition: opacity 0.15s;
 }
 
-.volume {
+.ctrl:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.ctrl:not(:disabled):hover {
+  opacity: 0.8;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+}
+
+.slider {
+  flex: 1;
+}
+
+.vol {
   display: none;
   align-items: center;
-  gap: 12px;
+  gap: var(--s-xs);
+  color: var(--c-muted);
+  width: 120px;
+  flex-shrink: 0;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 768px) {
+  .vol {
+    display: flex;
+  }
+}
+
+@media (max-width: 480px) {
   .player {
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    bottom: 0;
-    padding: 12px 32px;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-sm);
   }
 
-  .volume {
-    display: flex;
+  .right {
+    display: none;
   }
 }
 </style>

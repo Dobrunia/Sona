@@ -29,6 +29,6 @@ defineProps<{ tracks: Track[]; loading?: boolean; error?: boolean }>();
 <style scoped>
 .list {
   display: grid;
-  gap: 12px;
+  gap: var(--s-sm);
 }
 </style>

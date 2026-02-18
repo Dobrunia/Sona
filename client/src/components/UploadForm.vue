@@ -18,55 +18,37 @@
         @dragleave.prevent="dragActive = false"
         @drop.prevent="onDropAudio"
       >
-        <div>
-          <strong>{{ audioFile?.name ?? "Перетащи mp3 сюда" }}</strong>
-          <p>или нажми, чтобы выбрать файл</p>
-        </div>
+        <strong>{{ audioFile?.name ?? "Перетащи mp3 сюда" }}</strong>
+        <span class="hint">или нажми, чтобы выбрать файл</span>
         <input type="file" accept="audio/mpeg" @change="onAudioPick" />
       </div>
-      <div class="hint" v-if="audioFile">
-        {{ formatBytes(audioFile.size) }}
-      </div>
+      <span class="meta" v-if="audioFile">{{ formatBytes(audioFile.size) }}</span>
     </div>
 
     <div class="field">
       <label>Обложка (опционально)</label>
-      <div class="drop small">
-        <div>
-          <strong>{{ coverFile?.name ?? "Выбрать обложку" }}</strong>
-          <p>jpg / png / webp</p>
-        </div>
+      <div class="drop compact">
+        <strong>{{ coverFile?.name ?? "Выбрать обложку" }}</strong>
+        <span class="hint">jpg / png / webp</span>
         <input type="file" accept="image/png,image/jpeg,image/webp" @change="onCoverPick" />
       </div>
-      <div class="hint" v-if="coverFile">
-        {{ formatBytes(coverFile.size) }}
-      </div>
+      <span class="meta" v-if="coverFile">{{ formatBytes(coverFile.size) }}</span>
     </div>
 
     <v-alert v-if="error" type="error" variant="tonal">{{ error }}</v-alert>
 
-    <div class="progress" v-if="uploading">
-      <div>
-        <span>Загрузка трека</span>
-        <span>{{ audioProgress }}%</span>
-      </div>
-      <v-progress-linear :model-value="audioProgress" color="primary" height="8" rounded></v-progress-linear>
-      <div v-if="coverFile">
-        <span>Обложка</span>
-        <span>{{ coverProgress }}%</span>
-      </div>
-      <v-progress-linear
-        v-if="coverFile"
-        :model-value="coverProgress"
-        color="secondary"
-        height="6"
-        rounded
-      ></v-progress-linear>
+    <div class="progress-block" v-if="uploading">
+      <div class="row"><span>Трек</span><span>{{ audioProgress }}%</span></div>
+      <v-progress-linear :model-value="audioProgress" color="primary" height="6" rounded />
+      <template v-if="coverFile">
+        <div class="row"><span>Обложка</span><span>{{ coverProgress }}%</span></div>
+        <v-progress-linear :model-value="coverProgress" color="secondary" height="6" rounded />
+      </template>
     </div>
 
-    <v-btn :disabled="uploading" color="primary" size="large" type="submit">
+    <button class="submit" :disabled="uploading" type="submit">
       {{ uploading ? "Загрузка..." : "Загрузить" }}
-    </v-btn>
+    </button>
   </form>
 </template>
 
@@ -85,11 +67,7 @@ import type {
   RequestTrackUploadMutationVariables
 } from "@/graphql/generated";
 
-const form = ref({
-  title: "",
-  artist: ""
-});
-
+const form = ref({ title: "", artist: "" });
 const audioFile = ref<File | null>(null);
 const coverFile = ref<File | null>(null);
 const dragActive = ref(false);
@@ -106,9 +84,10 @@ const { mutate: requestUpload } = useMutation<
 const { mutate: createTrack } = useMutation<CreateTrackMutation, CreateTrackMutationVariables>(
   CREATE_TRACK
 );
-const { run: runCreateTrack } = useOptimisticMutation<CreateTrackMutationVariables, CreateTrackMutation>(
-  createTrack
-);
+const { run: runCreateTrack } = useOptimisticMutation<
+  CreateTrackMutationVariables,
+  CreateTrackMutation
+>(createTrack);
 
 const NEW_TRACK_FRAGMENT = gql`
   fragment NewTrack on Track {
@@ -127,84 +106,51 @@ function formatBytes(value: number) {
 }
 
 function onAudioPick(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file) return;
-  audioFile.value = file;
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file) audioFile.value = file;
 }
 
 function onCoverPick(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file) return;
-  coverFile.value = file;
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file) coverFile.value = file;
 }
 
 function onDropAudio(event: DragEvent) {
   dragActive.value = false;
   const file = event.dataTransfer?.files?.[0];
-  if (!file) return;
-  audioFile.value = file;
+  if (file) audioFile.value = file;
 }
 
 function validate() {
-  if (!form.value.title) {
-    return "Введите название трека";
-  }
-  if (!audioFile.value) {
-    return "Выберите mp3 файл";
-  }
-  if (!ALLOWED_AUDIO_MIME.includes(audioFile.value.type)) {
-    return "Разрешен только mp3";
-  }
-  if (audioFile.value.size > LIMITS.maxTrackSizeBytes) {
-    return "Файл слишком большой (макс 20MB)";
-  }
+  if (!form.value.title) return "Введите название трека";
+  if (!audioFile.value) return "Выберите mp3 файл";
+  if (!ALLOWED_AUDIO_MIME.includes(audioFile.value.type)) return "Разрешен только mp3";
+  if (audioFile.value.size > LIMITS.maxTrackSizeBytes) return "Файл слишком большой (макс 20MB)";
   if (coverFile.value) {
-    if (!ALLOWED_IMAGE_MIME.includes(coverFile.value.type)) {
-      return "Обложка должна быть jpg/png/webp";
-    }
-    if (coverFile.value.size > LIMITS.maxCoverSizeBytes) {
-      return "Обложка слишком большая (макс 2MB)";
-    }
+    if (!ALLOWED_IMAGE_MIME.includes(coverFile.value.type)) return "Обложка должна быть jpg/png/webp";
+    if (coverFile.value.size > LIMITS.maxCoverSizeBytes) return "Обложка слишком большая (макс 2MB)";
   }
   return "";
 }
 
-function uploadToUrl(url: string, file: File, onProgress: (value: number) => void) {
+function uploadToUrl(url: string, file: File, onProgress: (v: number) => void) {
   return new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("PUT", url, true);
     xhr.setRequestHeader("Content-Type", file.type);
-
-    xhr.upload.onprogress = (event) => {
-      if (!event.lengthComputable) return;
-      const percent = Math.round((event.loaded / event.total) * 100);
-      onProgress(percent);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
     };
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve();
-      } else {
-        reject(new Error("Upload failed"));
-      }
-    };
-
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error("Upload failed")));
     xhr.onerror = () => reject(new Error("Upload failed"));
-
     xhr.send(file);
   });
 }
 
 async function handleSubmit() {
   error.value = "";
-  const validationError = validate();
-  if (validationError) {
-    error.value = validationError;
-    return;
-  }
-
+  const msg = validate();
+  if (msg) { error.value = msg; return; }
   if (!audioFile.value) return;
 
   uploading.value = true;
@@ -226,18 +172,12 @@ async function handleSubmit() {
     });
 
     const payload = result?.data?.requestTrackUpload;
-    if (!payload) {
-      throw new Error("Upload request failed");
-    }
+    if (!payload) throw new Error("Upload request failed");
 
-    await uploadToUrl(payload.uploadUrl, audioFile.value, (value) => {
-      audioProgress.value = value;
-    });
+    await uploadToUrl(payload.uploadUrl, audioFile.value, (v) => { audioProgress.value = v; });
 
     if (coverFile.value && payload.coverUploadUrl) {
-      await uploadToUrl(payload.coverUploadUrl, coverFile.value, (value) => {
-        coverProgress.value = value;
-      });
+      await uploadToUrl(payload.coverUploadUrl, coverFile.value, (v) => { coverProgress.value = v; });
     }
 
     await runCreateTrack(
@@ -267,7 +207,6 @@ async function handleSubmit() {
             },
             fragment: NEW_TRACK_FRAGMENT
           });
-
           cache.modify({
             fields: {
               tracks(existing) {
@@ -275,10 +214,7 @@ async function handleSubmit() {
                 return {
                   ...existing,
                   items: [ref, ...existing.items],
-                  pageInfo: {
-                    ...existing.pageInfo,
-                    total: (existing.pageInfo?.total ?? 0) + 1
-                  }
+                  pageInfo: { ...existing.pageInfo, total: (existing.pageInfo?.total ?? 0) + 1 }
                 };
               }
             }
@@ -289,11 +225,10 @@ async function handleSubmit() {
     );
 
     toast.push("Трек загружен");
-    form.value.title = "";
-    form.value.artist = "";
+    form.value = { title: "", artist: "" };
     audioFile.value = null;
     coverFile.value = null;
-  } catch (err) {
+  } catch {
     error.value = "Не удалось загрузить трек";
     toast.push("Не удалось загрузить трек", "error");
   } finally {
@@ -305,43 +240,63 @@ async function handleSubmit() {
 <style scoped>
 .form {
   display: grid;
-  gap: 16px;
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  gap: var(--s-md);
+  background: var(--c-surface);
+  padding: var(--s-lg);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--c-border);
 }
 
 .field {
   display: grid;
-  gap: 8px;
-  font-size: 14px;
+  gap: var(--s-xs);
+}
+
+label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 input[type="text"] {
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 10px var(--s-sm);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--c-border);
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--c-text);
+  background: transparent;
+  transition: border-color 0.15s;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--c-text);
+}
+
+input[type="text"]::placeholder {
+  color: var(--c-muted);
 }
 
 .drop {
   position: relative;
-  border: 1px dashed rgba(0, 0, 0, 0.2);
-  border-radius: 16px;
-  padding: 16px;
-  display: grid;
-  gap: 6px;
-  background: #fafafa;
+  border: 1px dashed var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--s-lg) var(--s-md);
   cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.drop.small {
-  padding: 12px;
+.drop.compact {
+  padding: var(--s-md);
 }
 
-.drop.active {
-  border-color: #111111;
-  background: #f2f2f2;
+.drop.active,
+.drop:hover {
+  border-color: var(--c-text);
+  background: rgba(0, 0, 0, 0.01);
 }
 
 .drop input[type="file"] {
@@ -351,27 +306,50 @@ input[type="text"] {
   cursor: pointer;
 }
 
-.drop p {
-  margin: 0;
+.drop .hint {
+  display: block;
   font-size: 12px;
-  color: #6f6f6f;
+  color: var(--c-muted);
+  margin-top: var(--s-xs);
 }
 
-.hint {
+.meta {
   font-size: 12px;
-  color: #5f5f5f;
+  color: var(--c-muted);
 }
 
-.progress {
+.progress-block {
   display: grid;
-  gap: 8px;
+  gap: var(--s-sm);
 }
 
-.progress div {
+.row {
   display: flex;
-  align-items: center;
   justify-content: space-between;
   font-size: 12px;
-  color: #5f5f5f;
+  color: var(--c-muted);
+}
+
+.submit {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: var(--c-text);
+  color: var(--c-surface);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.submit:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.submit:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 </style>

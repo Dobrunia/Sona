@@ -1,12 +1,15 @@
 <template>
-  <div class="online-list">
+  <div class="list">
     <h3>Сейчас онлайн</h3>
     <div class="users">
       <div v-for="user in users" :key="String(user.id)" class="user">
-        <div class="avatar">
-          <img v-if="user.profile?.avatar" :src="user.profile.avatar" alt="avatar" />
-          <img v-else src="/icon.svg" alt="Sona" />
-        </div>
+        <img
+          v-if="user.profile?.avatar"
+          :src="user.profile.avatar"
+          alt="avatar"
+          class="avatar"
+        />
+        <img v-else src="/icon.svg" alt="Sona" class="avatar" />
         <div>
           <div class="name">{{ user.profile?.name || user.profile?.email || "Гость" }}</div>
           <div class="track">{{ user.trackId ? `Слушает #${user.trackId}` : "Без трека" }}</div>
@@ -25,50 +28,48 @@ const users = computed(() => presence.users);
 </script>
 
 <style scoped>
-.online-list {
-  background: #ffffff;
-  border-radius: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  padding: 16px;
+.list {
+  background: var(--c-surface);
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-border);
+  padding: var(--s-md);
   display: grid;
-  gap: 12px;
+  gap: var(--s-sm);
+}
+
+h3 {
+  margin: 0;
+  font-size: 14px;
 }
 
 .users {
   display: grid;
-  gap: 12px;
-  max-height: 240px;
+  gap: var(--s-sm);
+  max-height: 200px;
   overflow: auto;
 }
 
 .user {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 12px;
+  display: flex;
   align-items: center;
+  gap: var(--s-sm);
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f3f3f3;
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   object-fit: cover;
+  background: var(--c-bg);
 }
 
 .name {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .track {
-  font-size: 12px;
-  color: #6f6f6f;
+  font-size: 11px;
+  color: var(--c-muted);
 }
 </style>

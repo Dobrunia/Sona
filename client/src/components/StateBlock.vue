@@ -21,26 +21,26 @@ withDefaults(
 
 <style scoped>
 .state {
-  padding: 18px 20px;
-  border-radius: 16px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: var(--s-md);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
 }
 
 .state strong {
   display: block;
-  font-size: 15px;
-  margin-bottom: 6px;
+  font-size: 14px;
+  margin-bottom: var(--s-xs);
 }
 
 .state p {
   margin: 0;
-  color: #5f5f5f;
-  font-size: 14px;
+  color: var(--c-muted);
+  font-size: 13px;
 }
 
 .state.error {
-  border-color: rgba(255, 107, 74, 0.4);
+  border-color: var(--c-accent);
 }
 
 .state.empty {

@@ -13,46 +13,43 @@
 <style scoped>
 .skeleton {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  grid-template-columns: 44px 1fr;
+  align-items: center;
+  gap: var(--s-sm);
+  padding: var(--s-sm);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
 }
 
 .cover {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  background: linear-gradient(120deg, #ededed 30%, #f5f5f5 60%, #ededed 90%);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(120deg, #eee 30%, #f7f7f7 50%, #eee 70%);
   background-size: 200% 100%;
-  animation: shimmer 1.6s infinite;
+  animation: shimmer 1.4s infinite;
 }
 
 .lines {
   display: grid;
-  gap: 8px;
+  gap: var(--s-sm);
 }
 
 .line {
-  height: 12px;
-  border-radius: 999px;
-  background: linear-gradient(120deg, #ededed 30%, #f5f5f5 60%, #ededed 90%);
+  height: 10px;
+  border-radius: 4px;
+  background: linear-gradient(120deg, #eee 30%, #f7f7f7 50%, #eee 70%);
   background-size: 200% 100%;
-  animation: shimmer 1.6s infinite;
+  animation: shimmer 1.4s infinite;
 }
 
 .line.short {
-  width: 60%;
+  width: 50%;
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 </style>

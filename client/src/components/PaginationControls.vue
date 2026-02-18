@@ -1,12 +1,8 @@
 <template>
   <div class="pagination" v-if="total > pageSize">
-    <v-btn variant="text" :disabled="page <= 1" @click="change(page - 1)">
-      Назад
-    </v-btn>
-    <div class="info">{{ page }} / {{ totalPages }}</div>
-    <v-btn variant="text" :disabled="page >= totalPages" @click="change(page + 1)">
-      Вперед
-    </v-btn>
+    <button :disabled="page <= 1" @click="change(page - 1)">Назад</button>
+    <span class="info">{{ page }} / {{ totalPages }}</span>
+    <button :disabled="page >= totalPages" @click="change(page + 1)">Вперед</button>
   </div>
 </template>
 
@@ -28,12 +24,34 @@ function change(value: number) {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 12px 0;
+  gap: var(--s-md);
+  padding: var(--s-sm) 0;
+}
+
+button {
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-text);
+  cursor: pointer;
+  padding: var(--s-xs) var(--s-sm);
+  border-radius: var(--r-sm);
+  transition: background 0.15s;
+}
+
+button:hover:not(:disabled) {
+  background: var(--c-border);
+}
+
+button:disabled {
+  color: var(--c-muted);
+  cursor: default;
 }
 
 .info {
-  font-size: 14px;
-  color: #5f5f5f;
+  font-size: 13px;
+  color: var(--c-muted);
 }
 </style>

@@ -15,16 +15,17 @@ import UploadForm from "@/components/UploadForm.vue";
 <style scoped>
 .view {
   display: grid;
-  gap: 20px;
+  gap: var(--s-md);
 }
 
 .intro h1 {
-  margin-bottom: 6px;
-  font-size: clamp(26px, 3vw, 38px);
+  margin: 0 0 var(--s-xs);
+  font-size: 24px;
 }
 
 .intro p {
   margin: 0;
-  color: #5f5f5f;
+  color: var(--c-muted);
+  font-size: 14px;
 }
 </style>

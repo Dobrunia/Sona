@@ -1,9 +1,9 @@
 <template>
-  <div class="toast-host">
+  <div class="host">
     <transition-group name="toast" tag="div">
       <div v-for="item in items" :key="item.id" class="toast" :class="item.type">
         <span>{{ item.message }}</span>
-        <button class="close" @click="remove(item.id)">×</button>
+        <button @click="remove(item.id)">&times;</button>
       </div>
     </transition-group>
   </div>
@@ -22,12 +22,12 @@ function remove(id: string) {
 </script>
 
 <style scoped>
-.toast-host {
+.host {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  top: var(--s-md);
+  right: var(--s-md);
   display: grid;
-  gap: 10px;
+  gap: var(--s-sm);
   z-index: 100;
   pointer-events: none;
 }
@@ -36,26 +36,29 @@ function remove(id: string) {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 14px;
-  background: #111111;
-  color: #ffffff;
-  min-width: 240px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  gap: var(--s-sm);
+  padding: 10px var(--s-md);
+  border-radius: var(--r-sm);
+  background: var(--c-text);
+  color: var(--c-surface);
+  font-size: 13px;
+  min-width: 200px;
+  box-shadow: var(--shadow-lg);
 }
 
 .toast.error {
-  background: #ff6b4a;
+  background: var(--c-accent);
 }
 
-.close {
-  background: transparent;
+.toast button {
+  background: none;
   border: none;
   color: inherit;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
+  padding: 0;
+  margin-left: auto;
+  line-height: 1;
 }
 
 .toast-enter-active,
@@ -66,18 +69,15 @@ function remove(id: string) {
 .toast-enter-from,
 .toast-leave-to {
   opacity: 0;
-  transform: translateY(-8px);
+  transform: translateY(-6px);
 }
 
-@media (max-width: 600px) {
-  .toast-host {
+@media (max-width: 480px) {
+  .host {
     top: auto;
-    bottom: 90px;
-    left: 16px;
-    right: 16px;
-  }
-  .toast {
-    width: 100%;
+    bottom: calc(var(--player-h) + var(--nav-h) + var(--s-sm));
+    left: var(--s-md);
+    right: var(--s-md);
   }
 }
 </style>
