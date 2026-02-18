@@ -2,8 +2,8 @@
   <div class="host">
     <transition-group name="toast" tag="div">
       <div v-for="item in items" :key="item.id" class="toast" :class="item.type">
-        <span>{{ item.message }}</span>
-        <button @click="remove(item.id)">&times;</button>
+        <span>{{ item.type === 'error' ? '[ERROR] ' : '[OK] ' }}{{ item.message }}</span>
+        <button @click="remove(item.id)">X</button>
       </div>
     </transition-group>
   </div>
@@ -24,7 +24,7 @@ function remove(id: string) {
 <style scoped>
 .host {
   position: fixed;
-  top: var(--s-md);
+  top: calc(var(--header-h) + var(--s-sm));
   right: var(--s-md);
   display: grid;
   gap: var(--s-sm);
@@ -36,48 +36,41 @@ function remove(id: string) {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  gap: var(--s-sm);
-  padding: 10px var(--s-md);
-  border-radius: var(--r-sm);
-  background: var(--c-text);
-  color: var(--c-surface);
-  font-size: 13px;
+  gap: var(--s-md);
+  padding: var(--s-sm) var(--s-md);
+  background: #ffffcc;
+  border: var(--border-raised);
+  font-size: 12px;
+  font-family: "Tahoma", "Arial", sans-serif;
   min-width: 200px;
-  box-shadow: var(--shadow-lg);
 }
 
 .toast.error {
-  background: var(--c-accent);
+  background: #ffcccc;
 }
 
 .toast button {
-  background: none;
-  border: none;
-  color: inherit;
-  font-size: 16px;
+  background: var(--c-surface);
+  border: var(--border-raised);
+  font-size: 10px;
+  font-weight: bold;
   cursor: pointer;
-  padding: 0;
+  padding: 0 4px;
   margin-left: auto;
-  line-height: 1;
+  font-family: "Tahoma", sans-serif;
+}
+
+.toast button:active {
+  border: var(--border-sunken);
 }
 
 .toast-enter-active,
 .toast-leave-active {
-  transition: all 0.2s ease;
+  transition: opacity 0.15s;
 }
 
 .toast-enter-from,
 .toast-leave-to {
   opacity: 0;
-  transform: translateY(-6px);
-}
-
-@media (max-width: 480px) {
-  .host {
-    top: auto;
-    bottom: calc(var(--player-h) + var(--nav-h) + var(--s-sm));
-    left: var(--s-md);
-    right: var(--s-md);
-  }
 }
 </style>

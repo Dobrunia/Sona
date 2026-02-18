@@ -1,20 +1,12 @@
 <template>
-  <div class="list">
-    <h3>Сейчас онлайн</h3>
-    <div class="users">
+  <div class="window">
+    <div class="title-bar">Online Users</div>
+    <div class="body">
       <div v-for="user in users" :key="String(user.id)" class="user">
-        <img
-          v-if="user.profile?.avatar"
-          :src="user.profile.avatar"
-          alt="avatar"
-          class="avatar"
-        />
-        <img v-else src="/icon.svg" alt="Sona" class="avatar" />
-        <div>
-          <div class="name">{{ user.profile?.name || user.profile?.email || "Гость" }}</div>
-          <div class="track">{{ user.trackId ? `Слушает #${user.trackId}` : "Без трека" }}</div>
-        </div>
+        <b>{{ user.profile?.name || user.profile?.email || "Guest" }}</b>
+        <span class="status">{{ user.trackId ? `listening #${user.trackId}` : "idle" }}</span>
       </div>
+      <div v-if="!users.length" class="empty">No users online.</div>
     </div>
   </div>
 </template>
@@ -28,48 +20,47 @@ const users = computed(() => presence.users);
 </script>
 
 <style scoped>
-.list {
+.window {
   background: var(--c-surface);
-  border-radius: var(--r-md);
-  border: 1px solid var(--c-border);
-  padding: var(--s-md);
-  display: grid;
-  gap: var(--s-sm);
+  border: var(--border-raised);
 }
 
-h3 {
-  margin: 0;
-  font-size: 14px;
+.title-bar {
+  background: var(--c-title-bar);
+  color: var(--c-title-text);
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px var(--s-sm);
 }
 
-.users {
-  display: grid;
-  gap: var(--s-sm);
-  max-height: 200px;
+.body {
+  padding: var(--s-sm);
+  background: var(--c-window);
+  border: var(--border-sunken);
+  margin: var(--s-xs);
+  max-height: 160px;
   overflow: auto;
+  font-size: 12px;
 }
 
 .user {
-  display: flex;
-  align-items: center;
-  gap: var(--s-sm);
+  padding: var(--s-xs) 0;
+  border-bottom: 1px dotted #999;
 }
 
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: var(--c-bg);
+.user:last-child {
+  border-bottom: none;
 }
 
-.name {
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.track {
-  font-size: 11px;
+.status {
   color: var(--c-muted);
+  font-size: 11px;
+  margin-left: var(--s-sm);
+}
+
+.empty {
+  color: var(--c-muted);
+  font-style: italic;
 }
 </style>

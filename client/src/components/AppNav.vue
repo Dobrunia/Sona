@@ -1,17 +1,18 @@
 <template>
   <nav class="nav">
-    <router-link to="/" class="tab" :class="{ active: route.path === '/' }">
-      <v-icon icon="mdi-home-variant" size="20" />
-      <span>Лента</span>
-    </router-link>
-    <router-link to="/favorites" class="tab" :class="{ active: route.path === '/favorites' }">
-      <v-icon icon="mdi-heart-outline" size="20" />
-      <span>Избранное</span>
-    </router-link>
-    <router-link to="/upload" class="tab" :class="{ active: route.path === '/upload' }">
-      <v-icon icon="mdi-cloud-upload-outline" size="20" />
-      <span>Загрузить</span>
-    </router-link>
+    <div class="bar">
+      <router-link to="/" class="nav-link" :class="{ active: route.path === '/' }">
+        [Home]
+      </router-link>
+      <span class="sep">|</span>
+      <router-link to="/favorites" class="nav-link" :class="{ active: route.path === '/favorites' }">
+        [Favorites]
+      </router-link>
+      <span class="sep">|</span>
+      <router-link to="/upload" class="nav-link" :class="{ active: route.path === '/upload' }">
+        [Upload]
+      </router-link>
+    </div>
   </nav>
 </template>
 
@@ -28,28 +29,36 @@ const route = useRoute();
   right: 0;
   bottom: 0;
   z-index: 20;
+  background: var(--c-surface);
+  border-top: var(--border-raised);
+}
+
+.bar {
   height: var(--nav-h);
   display: flex;
-  align-items: stretch;
-  background: var(--c-surface);
-  border-top: 1px solid var(--c-border);
-}
-
-.tab {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--c-muted);
-  text-decoration: none;
-  transition: color 0.15s;
+  gap: var(--s-md);
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 12px;
 }
 
-.tab.active {
+.nav-link {
+  color: var(--c-link);
+  text-decoration: underline;
+}
+
+.nav-link:visited {
+  color: var(--c-link);
+}
+
+.nav-link.active {
   color: var(--c-text);
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.sep {
+  color: var(--c-muted);
 }
 </style>

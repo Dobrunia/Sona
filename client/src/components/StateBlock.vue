@@ -1,6 +1,6 @@
 <template>
   <div class="state" :class="tone">
-    <strong>{{ title }}</strong>
+    <b>{{ title }}</b>
     <p v-if="description">{{ description }}</p>
   </div>
 </template>
@@ -22,28 +22,27 @@ withDefaults(
 <style scoped>
 .state {
   padding: var(--s-md);
-  border-radius: var(--r-md);
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
+  font-size: 12px;
+  border: var(--border-sunken);
+  background: var(--c-input-bg);
 }
 
-.state strong {
+.state b {
   display: block;
-  font-size: 14px;
   margin-bottom: var(--s-xs);
 }
 
 .state p {
   margin: 0;
   color: var(--c-muted);
-  font-size: 13px;
 }
 
 .state.error {
-  border-color: var(--c-accent);
+  background: #fff0f0;
+  color: #cc0000;
 }
 
-.state.empty {
-  border-style: dashed;
+.state.error p {
+  color: #cc0000;
 }
 </style>

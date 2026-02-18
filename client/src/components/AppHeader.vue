@@ -1,41 +1,29 @@
 <template>
   <header class="header">
-    <div class="col">
-      <div class="brand">
-        <img src="/icon.svg" alt="Sona" class="logo" />
-        <span>Sona</span>
+    <div class="title-bar">
+      <div class="title">
+        <img src="/icon.svg" alt="Sona" class="icon" />
+        <span>Sona Music Service</span>
       </div>
-
-      <div class="right">
-        <span class="online">{{ presence.count }} online</span>
-
+      <div class="controls">
+        <span class="online">[{{ presence.count }} online]</span>
         <v-menu>
           <template #activator="{ props }">
-            <button v-bind="props" class="avatar-btn">
-              <img
-                v-if="auth.user?.avatar"
-                :src="auth.user.avatar"
-                alt="avatar"
-                class="avatar"
-              />
-              <img v-else src="/icon.svg" alt="Sona" class="avatar" />
+            <button v-bind="props" class="win-btn sm">
+              {{ auth.user?.name?.charAt(0)?.toUpperCase() || '?' }}
             </button>
           </template>
-          <v-list class="menu" width="220">
-            <v-list-item>
-              <v-list-item-title class="menu-name">
-                {{ auth.user?.name || "Пользователь" }}
-              </v-list-item-title>
-              <v-list-item-subtitle>{{ auth.user?.email || "" }}</v-list-item-subtitle>
-            </v-list-item>
-            <v-divider />
-            <v-list-item @click="logout" :disabled="loading">
-              <template #prepend>
-                <v-icon icon="mdi-logout" size="18" />
-              </template>
-              <v-list-item-title>Выйти</v-list-item-title>
-            </v-list-item>
-          </v-list>
+          <div class="dropdown">
+            <div class="dropdown-header">User Profile</div>
+            <div class="dropdown-body">
+              <div v-if="auth.user">
+                <b>{{ auth.user.name || "User" }}</b><br />
+                <span class="muted">{{ auth.user.email }}</span>
+              </div>
+              <hr />
+              <a href="#" class="link" @click.prevent="logout">[ Log Out ]</a>
+            </div>
+          </div>
         </v-menu>
       </div>
     </div>
@@ -70,74 +58,109 @@ async function logout() {
   left: 0;
   right: 0;
   z-index: 20;
-  height: var(--header-h);
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid var(--c-border);
-  background: rgba(244, 244, 242, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
 }
 
-.col {
-  width: 100%;
-  max-width: var(--col-width);
-  margin: 0 auto;
-  padding: 0 var(--s-md);
+.title-bar {
+  height: var(--header-h);
+  background: var(--c-title-bar);
+  color: var(--c-title-text);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 var(--s-sm);
+  font-size: 12px;
+  font-weight: bold;
+  font-family: "Tahoma", "Arial", sans-serif;
 }
 
-.brand {
+.title {
   display: flex;
   align-items: center;
   gap: var(--s-sm);
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
-.logo {
-  width: 28px;
-  height: 28px;
+.icon {
+  width: 16px;
+  height: 16px;
+  filter: brightness(10);
 }
 
-.right {
+.controls {
   display: flex;
   align-items: center;
   gap: var(--s-md);
 }
 
 .online {
-  font-size: 12px;
-  color: var(--c-muted);
-  font-weight: 500;
+  font-weight: normal;
+  font-size: 11px;
+  opacity: 0.8;
 }
 
-.avatar-btn {
-  background: none;
-  border: none;
+.win-btn {
+  background: var(--c-surface);
+  border: var(--border-raised);
+  color: var(--c-text);
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 11px;
   cursor: pointer;
+  padding: 1px 6px;
+}
+
+.win-btn:active {
+  border: var(--border-sunken);
+}
+
+.win-btn.sm {
+  width: 20px;
+  height: 20px;
   padding: 0;
-  line-height: 0;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+  font-size: 10px;
 }
 
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid var(--c-border);
+.dropdown {
+  background: var(--c-window);
+  border: var(--border-raised);
+  min-width: 200px;
+  font-family: var(--font);
+  font-size: 13px;
 }
 
-.menu {
-  border-radius: var(--r-md) !important;
-  box-shadow: var(--shadow-lg) !important;
+.dropdown-header {
+  background: var(--c-title-bar);
+  color: var(--c-title-text);
+  padding: 2px var(--s-sm);
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 11px;
+  font-weight: bold;
 }
 
-.menu-name {
-  font-weight: 600;
+.dropdown-body {
+  padding: var(--s-md);
+}
+
+.dropdown-body hr {
+  border: none;
+  border-top: var(--border-groove);
+  margin: var(--s-md) 0;
+}
+
+.link {
+  color: var(--c-link);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.link:visited {
+  color: var(--c-link-visited);
+}
+
+.muted {
+  color: var(--c-muted);
+  font-size: 12px;
 }
 </style>

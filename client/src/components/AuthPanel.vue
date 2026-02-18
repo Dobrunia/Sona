@@ -1,27 +1,18 @@
 <template>
   <div>
     <div v-if="auth.user" class="profile">
-      <img
-        v-if="auth.user.avatar"
-        :src="auth.user.avatar"
-        alt="avatar"
-        class="avatar"
-      />
-      <img v-else src="/icon.svg" alt="Sona" class="avatar" />
-      <div>
-        <div class="email">{{ auth.user.email }}</div>
-        <div class="name" v-if="auth.user.name">{{ auth.user.name }}</div>
-      </div>
+      <p>Logged in as: <b>{{ auth.user.email }}</b></p>
+      <p v-if="auth.user.name">Name: {{ auth.user.name }}</p>
     </div>
     <div v-else class="login">
-      <p>Войди через Google, чтобы продолжить.</p>
+      <p>Sign in with your Google account:</p>
       <div class="google-button" :id="googleButtonId"></div>
       <p v-if="googleUnavailable" class="warn">
-        Google кнопка не загрузилась. Проверь VITE_GOOGLE_CLIENT_ID.
+        [!] Google button failed to load. Check VITE_GOOGLE_CLIENT_ID.
       </p>
     </div>
     <div class="actions" v-if="auth.user">
-      <button class="logout-btn" :disabled="loading" @click="logout">Выйти</button>
+      <button class="win-btn" :disabled="loading" @click="logout">Log Out</button>
     </div>
   </div>
 </template>
@@ -67,34 +58,10 @@ async function logout() {
 </script>
 
 <style scoped>
-.profile {
-  display: flex;
-  gap: var(--s-sm);
-  align-items: center;
-}
-
-.avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: var(--c-bg);
-}
-
-.email {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.name {
-  font-size: 12px;
-  color: var(--c-muted);
-}
-
+.profile p,
 .login p {
-  margin: 0 0 var(--s-sm);
-  font-size: 13px;
-  color: var(--c-muted);
+  margin: var(--s-sm) 0;
+  font-size: 12px;
 }
 
 .google-button {
@@ -102,29 +69,29 @@ async function logout() {
 }
 
 .warn {
-  color: var(--c-accent);
-  font-size: 12px;
+  color: #cc0000;
+  font-size: 11px;
+  font-weight: bold;
 }
 
 .actions {
   margin-top: var(--s-md);
-  display: flex;
-  justify-content: flex-end;
 }
 
-.logout-btn {
-  background: none;
-  border: 1px solid var(--c-border);
-  border-radius: var(--r-sm);
-  padding: var(--s-xs) var(--s-sm);
-  font-family: var(--font);
-  font-size: 13px;
+.win-btn {
+  background: var(--c-surface);
+  border: var(--border-raised);
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 12px;
+  padding: 2px 16px;
   cursor: pointer;
-  color: var(--c-text);
-  transition: background 0.15s;
 }
 
-.logout-btn:hover {
-  background: var(--c-bg);
+.win-btn:active {
+  border: var(--border-sunken);
+}
+
+.win-btn:disabled {
+  color: #808080;
 }
 </style>

@@ -1,28 +1,23 @@
 <template>
-  <article class="card">
-    <div class="cover" @click="play">
-      <img v-if="track.coverUrl" :src="track.coverUrl" :alt="track.title" />
-      <div v-else class="fallback">
-        <img src="/icon.svg" alt="Sona" />
+  <tr class="row" @dblclick="play">
+    <td class="cell cover-cell">
+      <div class="cover">
+        <img v-if="track.coverUrl" :src="track.coverUrl" :alt="track.title" />
+        <span v-else class="no-img">-</span>
       </div>
-    </div>
-    <div class="body">
-      <div class="title">{{ track.title }}</div>
-      <div class="artist">{{ track.artist || "Unknown" }}</div>
-    </div>
-    <div class="actions">
-      <button class="icon-btn" @click="toggleLike">
-        <v-icon
-          :icon="liked ? 'mdi-heart' : 'mdi-heart-outline'"
-          :color="liked ? '#ff6b4a' : undefined"
-          size="20"
-        />
-      </button>
-      <button class="icon-btn" @click="play">
-        <v-icon icon="mdi-play" size="20" />
-      </button>
-    </div>
-  </article>
+    </td>
+    <td class="cell title-cell">
+      <a href="#" class="track-link" @click.prevent="play">{{ track.title }}</a>
+    </td>
+    <td class="cell artist-cell">{{ track.artist || "Unknown" }}</td>
+    <td class="cell actions-cell">
+      <a href="#" class="link" @click.prevent="toggleLike">
+        {{ liked ? '[Unlike]' : '[Like]' }}
+      </a>
+      &nbsp;
+      <a href="#" class="link" @click.prevent="play">[Play]</a>
+    </td>
+  </tr>
 </template>
 
 <script setup lang="ts">
@@ -52,7 +47,7 @@ const { run } = useOptimisticMutation<ToggleLikeMutationVariables, ToggleLikeMut
 
 async function toggleLike() {
   if (!auth.accessToken) {
-    toast.push("Нужен вход в аккаунт", "error");
+    toast.push("Login required", "error");
     return;
   }
 
@@ -64,20 +59,12 @@ async function toggleLike() {
     await run(
       { trackId: String(props.track.id) },
       {
-        optimisticResponse: {
-          toggleLike: next
-        },
+        optimisticResponse: { toggleLike: next },
         update(cache) {
           const id = cache.identify({ __typename: "Track", id: props.track.id });
           if (id) {
-            cache.modify({
-              id,
-              fields: {
-                likedByMe: () => next
-              }
-            });
+            cache.modify({ id, fields: { likedByMe: () => next } });
           }
-
           if (!next) {
             cache.modify({
               fields: {
@@ -104,7 +91,7 @@ async function toggleLike() {
     );
   } catch {
     localLiked.value = prev;
-    toast.push("Не удалось поставить лайк", "error");
+    toast.push("Action failed", "error");
   }
 }
 
@@ -114,29 +101,40 @@ function play() {
 </script>
 
 <style scoped>
-.card {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  align-items: center;
-  gap: var(--s-sm);
-  padding: var(--s-sm);
-  border-radius: var(--r-md);
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  transition: box-shadow 0.15s;
+.row:hover {
+  background: var(--c-highlight);
+  color: var(--c-white);
 }
 
-.card:hover {
-  box-shadow: var(--shadow);
+.row:hover .link,
+.row:hover .track-link {
+  color: var(--c-white);
+}
+
+.row:hover .artist-cell {
+  color: #ccc;
+}
+
+.cell {
+  padding: var(--s-xs) var(--s-sm);
+  font-size: 12px;
+  vertical-align: middle;
+  white-space: nowrap;
+  border-bottom: 1px solid #bbb;
+}
+
+.cover-cell {
+  width: 28px;
 }
 
 .cover {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--r-sm);
+  width: 24px;
+  height: 24px;
+  border: 1px solid #999;
+  background: var(--c-bg);
   overflow: hidden;
-  cursor: pointer;
-  flex-shrink: 0;
+  display: grid;
+  place-items: center;
 }
 
 .cover img {
@@ -145,57 +143,35 @@ function play() {
   object-fit: cover;
 }
 
-.fallback {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #222, var(--c-accent));
+.no-img {
+  font-size: 10px;
+  color: #999;
 }
 
-.fallback img {
-  width: 18px;
-  height: 18px;
-}
-
-.body {
-  min-width: 0;
-}
-
-.title {
-  font-weight: 600;
-  font-size: 14px;
-  white-space: nowrap;
+.title-cell {
+  max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.artist {
-  font-size: 12px;
-  color: var(--c-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.actions {
-  display: flex;
-  gap: var(--s-xs);
-}
-
-.icon-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
+.track-link {
+  color: var(--c-link);
+  text-decoration: underline;
   cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: background 0.15s;
 }
 
-.icon-btn:hover {
-  background: var(--c-bg);
+.artist-cell {
+  color: var(--c-muted);
+}
+
+.actions-cell {
+  text-align: right;
+}
+
+.link {
+  color: var(--c-link);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 11px;
 }
 </style>

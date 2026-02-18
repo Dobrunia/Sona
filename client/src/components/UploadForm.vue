@@ -1,55 +1,54 @@
 <template>
-  <form class="form" @submit.prevent="handleSubmit">
-    <div class="field">
-      <label>Название</label>
-      <input v-model.trim="form.title" type="text" placeholder="Название трека" />
-    </div>
-    <div class="field">
-      <label>Исполнитель</label>
-      <input v-model.trim="form.artist" type="text" placeholder="Имя исполнителя" />
-    </div>
+  <div class="window">
+    <div class="title-bar">Upload Track</div>
+    <form class="body" @submit.prevent="handleSubmit">
+      <table class="form-table" cellspacing="0">
+        <tr>
+          <td class="label">Title:</td>
+          <td><input v-model.trim="form.title" type="text" class="input full" /></td>
+        </tr>
+        <tr>
+          <td class="label">Artist:</td>
+          <td><input v-model.trim="form.artist" type="text" class="input full" /></td>
+        </tr>
+        <tr>
+          <td class="label">MP3 File:</td>
+          <td>
+            <input type="file" accept="audio/mpeg" @change="onAudioPick" class="file-input" />
+            <span v-if="audioFile" class="meta">({{ formatBytes(audioFile.size) }})</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="label">Cover:</td>
+          <td>
+            <input type="file" accept="image/png,image/jpeg,image/webp" @change="onCoverPick" class="file-input" />
+            <span v-if="coverFile" class="meta">({{ formatBytes(coverFile.size) }})</span>
+          </td>
+        </tr>
+      </table>
 
-    <div class="field">
-      <label>MP3 файл</label>
-      <div
-        class="drop"
-        :class="{ active: dragActive }"
-        @dragover.prevent="dragActive = true"
-        @dragleave.prevent="dragActive = false"
-        @drop.prevent="onDropAudio"
-      >
-        <strong>{{ audioFile?.name ?? "Перетащи mp3 сюда" }}</strong>
-        <span class="hint">или нажми, чтобы выбрать файл</span>
-        <input type="file" accept="audio/mpeg" @change="onAudioPick" />
+      <div v-if="error" class="error-box">ERROR: {{ error }}</div>
+
+      <div v-if="uploading" class="progress-box">
+        <div>Uploading track... {{ audioProgress }}%</div>
+        <div class="progress-bar">
+          <div class="fill" :style="{ width: audioProgress + '%' }"></div>
+        </div>
+        <template v-if="coverFile">
+          <div>Uploading cover... {{ coverProgress }}%</div>
+          <div class="progress-bar">
+            <div class="fill" :style="{ width: coverProgress + '%' }"></div>
+          </div>
+        </template>
       </div>
-      <span class="meta" v-if="audioFile">{{ formatBytes(audioFile.size) }}</span>
-    </div>
 
-    <div class="field">
-      <label>Обложка (опционально)</label>
-      <div class="drop compact">
-        <strong>{{ coverFile?.name ?? "Выбрать обложку" }}</strong>
-        <span class="hint">jpg / png / webp</span>
-        <input type="file" accept="image/png,image/jpeg,image/webp" @change="onCoverPick" />
+      <div class="actions">
+        <button type="submit" class="win-btn" :disabled="uploading">
+          {{ uploading ? 'Uploading...' : 'Upload' }}
+        </button>
       </div>
-      <span class="meta" v-if="coverFile">{{ formatBytes(coverFile.size) }}</span>
-    </div>
-
-    <v-alert v-if="error" type="error" variant="tonal">{{ error }}</v-alert>
-
-    <div class="progress-block" v-if="uploading">
-      <div class="row"><span>Трек</span><span>{{ audioProgress }}%</span></div>
-      <v-progress-linear :model-value="audioProgress" color="primary" height="6" rounded />
-      <template v-if="coverFile">
-        <div class="row"><span>Обложка</span><span>{{ coverProgress }}%</span></div>
-        <v-progress-linear :model-value="coverProgress" color="secondary" height="6" rounded />
-      </template>
-    </div>
-
-    <button class="submit" :disabled="uploading" type="submit">
-      {{ uploading ? "Загрузка..." : "Загрузить" }}
-    </button>
-  </form>
+    </form>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -70,7 +69,6 @@ import type {
 const form = ref({ title: "", artist: "" });
 const audioFile = ref<File | null>(null);
 const coverFile = ref<File | null>(null);
-const dragActive = ref(false);
 const uploading = ref(false);
 const audioProgress = ref(0);
 const coverProgress = ref(0);
@@ -115,20 +113,14 @@ function onCoverPick(event: Event) {
   if (file) coverFile.value = file;
 }
 
-function onDropAudio(event: DragEvent) {
-  dragActive.value = false;
-  const file = event.dataTransfer?.files?.[0];
-  if (file) audioFile.value = file;
-}
-
 function validate() {
-  if (!form.value.title) return "Введите название трека";
-  if (!audioFile.value) return "Выберите mp3 файл";
-  if (!ALLOWED_AUDIO_MIME.includes(audioFile.value.type)) return "Разрешен только mp3";
-  if (audioFile.value.size > LIMITS.maxTrackSizeBytes) return "Файл слишком большой (макс 20MB)";
+  if (!form.value.title) return "Title is required";
+  if (!audioFile.value) return "MP3 file is required";
+  if (!ALLOWED_AUDIO_MIME.includes(audioFile.value.type)) return "Only MP3 allowed";
+  if (audioFile.value.size > LIMITS.maxTrackSizeBytes) return "File too large (max 20MB)";
   if (coverFile.value) {
-    if (!ALLOWED_IMAGE_MIME.includes(coverFile.value.type)) return "Обложка должна быть jpg/png/webp";
-    if (coverFile.value.size > LIMITS.maxCoverSizeBytes) return "Обложка слишком большая (макс 2MB)";
+    if (!ALLOWED_IMAGE_MIME.includes(coverFile.value.type)) return "Cover must be jpg/png/webp";
+    if (coverFile.value.size > LIMITS.maxCoverSizeBytes) return "Cover too large (max 2MB)";
   }
   return "";
 }
@@ -224,13 +216,13 @@ async function handleSubmit() {
       }
     );
 
-    toast.push("Трек загружен");
+    toast.push("Track uploaded!");
     form.value = { title: "", artist: "" };
     audioFile.value = null;
     coverFile.value = null;
   } catch {
-    error.value = "Не удалось загрузить трек";
-    toast.push("Не удалось загрузить трек", "error");
+    error.value = "Upload failed";
+    toast.push("Upload failed", "error");
   } finally {
     uploading.value = false;
   }
@@ -238,118 +230,115 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.form {
-  display: grid;
-  gap: var(--s-md);
+.window {
   background: var(--c-surface);
-  padding: var(--s-lg);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--c-border);
+  border: var(--border-raised);
 }
 
-.field {
+.title-bar {
+  background: var(--c-title-bar);
+  color: var(--c-title-text);
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px var(--s-sm);
+}
+
+.body {
+  padding: var(--s-md);
+}
+
+.form-table {
+  width: 100%;
+  font-size: 12px;
+  font-family: "Tahoma", "Arial", sans-serif;
+}
+
+.form-table td {
+  padding: var(--s-xs) var(--s-sm);
+  vertical-align: middle;
+}
+
+.label {
+  font-weight: bold;
+  white-space: nowrap;
+  width: 70px;
+}
+
+.input {
+  border: var(--border-sunken);
+  background: var(--c-input-bg);
+  padding: 2px var(--s-sm);
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+.input.full {
+  width: 100%;
+}
+
+.input:focus {
+  outline: 1px dotted var(--c-text);
+}
+
+.file-input {
+  font-size: 11px;
+  font-family: "Tahoma", "Arial", sans-serif;
+}
+
+.meta {
+  font-size: 11px;
+  color: var(--c-muted);
+}
+
+.error-box {
+  margin-top: var(--s-md);
+  padding: var(--s-sm);
+  border: var(--border-sunken);
+  background: #fff0f0;
+  color: #cc0000;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.progress-box {
+  margin-top: var(--s-md);
+  font-size: 11px;
   display: grid;
   gap: var(--s-xs);
 }
 
-label {
+.progress-bar {
+  height: 14px;
+  border: var(--border-sunken);
+  background: var(--c-input-bg);
+}
+
+.fill {
+  height: 100%;
+  background: var(--c-accent);
+  transition: width 0.2s;
+}
+
+.actions {
+  margin-top: var(--s-md);
+}
+
+.win-btn {
+  background: var(--c-surface);
+  border: var(--border-raised);
+  font-family: "Tahoma", "Arial", sans-serif;
   font-size: 12px;
-  font-weight: 500;
-  color: var(--c-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-input[type="text"] {
-  padding: 10px var(--s-sm);
-  border-radius: var(--r-sm);
-  border: 1px solid var(--c-border);
-  font-family: var(--font);
-  font-size: 14px;
-  color: var(--c-text);
-  background: transparent;
-  transition: border-color 0.15s;
-}
-
-input[type="text"]:focus {
-  outline: none;
-  border-color: var(--c-text);
-}
-
-input[type="text"]::placeholder {
-  color: var(--c-muted);
-}
-
-.drop {
-  position: relative;
-  border: 1px dashed var(--c-border);
-  border-radius: var(--r-md);
-  padding: var(--s-lg) var(--s-md);
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.drop.compact {
-  padding: var(--s-md);
-}
-
-.drop.active,
-.drop:hover {
-  border-color: var(--c-text);
-  background: rgba(0, 0, 0, 0.01);
-}
-
-.drop input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
+  padding: 2px 16px;
   cursor: pointer;
 }
 
-.drop .hint {
-  display: block;
-  font-size: 12px;
-  color: var(--c-muted);
-  margin-top: var(--s-xs);
+.win-btn:active {
+  border: var(--border-sunken);
 }
 
-.meta {
-  font-size: 12px;
-  color: var(--c-muted);
-}
-
-.progress-block {
-  display: grid;
-  gap: var(--s-sm);
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--c-muted);
-}
-
-.submit {
-  width: 100%;
-  padding: 12px;
-  border-radius: var(--r-sm);
-  border: none;
-  background: var(--c-text);
-  color: var(--c-surface);
-  font-family: var(--font);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.submit:hover:not(:disabled) {
-  opacity: 0.85;
-}
-
-.submit:disabled {
-  opacity: 0.4;
+.win-btn:disabled {
+  color: #808080;
   cursor: default;
 }
 </style>

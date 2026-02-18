@@ -2,44 +2,50 @@
   <div class="player">
     <audio ref="audioEl" preload="metadata"></audio>
 
-    <div class="left">
-      <div class="cover">
-        <img v-if="current?.coverUrl" :src="current.coverUrl" :alt="current.title" />
-        <img v-else src="/icon.svg" alt="Sona" />
+    <div class="window">
+      <div class="title-bar">
+        <span>Now Playing</span>
       </div>
-      <div class="info">
-        <span class="title">{{ current?.title ?? "Не выбрано" }}</span>
-        <span class="artist">{{ current?.artist ?? "" }}</span>
-      </div>
-    </div>
+      <div class="body">
+        <div class="left">
+          <div class="cover">
+            <img v-if="current?.coverUrl" :src="current.coverUrl" :alt="current.title" />
+            <span v-else class="no-cover">NO<br/>IMG</span>
+          </div>
+          <div class="info">
+            <b>{{ current?.title ?? "No track selected" }}</b>
+            <span class="artist">{{ current?.artist ?? "---" }}</span>
+          </div>
+        </div>
 
-    <div class="center">
-      <button class="ctrl" @click="player.toggle" :disabled="!current">
-        <v-icon :icon="player.isPlaying ? 'mdi-pause' : 'mdi-play'" size="22" />
-      </button>
-    </div>
+        <div class="controls">
+          <button class="win-btn" @click="player.toggle" :disabled="!current">
+            {{ player.isPlaying ? '||' : '>' }}
+          </button>
+        </div>
 
-    <div class="right">
-      <v-slider
-        v-model="progress"
-        hide-details
-        :min="0"
-        :max="100"
-        class="slider"
-        color="primary"
-        track-color="rgba(0,0,0,0.08)"
-      />
-      <div class="vol">
-        <v-icon icon="mdi-volume-high" size="16" />
-        <v-slider
-          v-model="volume"
-          hide-details
-          :min="0"
-          :max="100"
-          class="slider"
-          color="primary"
-          track-color="rgba(0,0,0,0.08)"
-        />
+        <div class="sliders">
+          <div class="slider-row">
+            <label>Pos:</label>
+            <input
+              type="range"
+              :value="progress"
+              min="0"
+              max="100"
+              @input="onProgress"
+            />
+          </div>
+          <div class="slider-row">
+            <label>Vol:</label>
+            <input
+              type="range"
+              :value="volume"
+              min="0"
+              max="100"
+              @input="onVolume"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -53,15 +59,16 @@ const player = usePlayerStore();
 const current = computed(() => player.current);
 const audioEl = ref<HTMLAudioElement | null>(null);
 
-const progress = computed({
-  get: () => Math.round(player.progress * 100),
-  set: (value: number) => player.setProgress(value / 100)
-});
+const progress = computed(() => Math.round(player.progress * 100));
+const volume = computed(() => Math.round(player.volume * 100));
 
-const volume = computed({
-  get: () => Math.round(player.volume * 100),
-  set: (value: number) => player.setVolume(value / 100)
-});
+function onProgress(e: Event) {
+  player.setProgress(Number((e.target as HTMLInputElement).value) / 100);
+}
+
+function onVolume(e: Event) {
+  player.setVolume(Number((e.target as HTMLInputElement).value) / 100);
+}
 
 watch(
   () => player.streamUrl,
@@ -69,9 +76,7 @@ watch(
     if (!url || !audioEl.value) return;
     audioEl.value.src = url;
     audioEl.value.load();
-    if (player.isPlaying) {
-      await audioEl.value.play();
-    }
+    if (player.isPlaying) await audioEl.value.play();
   }
 );
 
@@ -79,11 +84,7 @@ watch(
   () => player.isPlaying,
   (playing) => {
     if (!audioEl.value) return;
-    if (playing) {
-      audioEl.value.play();
-    } else {
-      audioEl.value.pause();
-    }
+    playing ? audioEl.value.play() : audioEl.value.pause();
   }
 );
 
@@ -91,18 +92,15 @@ watch(
   () => player.progress,
   (value) => {
     if (!audioEl.value || !audioEl.value.duration) return;
-    const nextTime = value * audioEl.value.duration;
-    if (Math.abs(audioEl.value.currentTime - nextTime) > 0.5) {
-      audioEl.value.currentTime = nextTime;
-    }
+    const t = value * audioEl.value.duration;
+    if (Math.abs(audioEl.value.currentTime - t) > 0.5) audioEl.value.currentTime = t;
   }
 );
 
 watch(
   () => player.volume,
   (value) => {
-    if (!audioEl.value) return;
-    audioEl.value.volume = value;
+    if (audioEl.value) audioEl.value.volume = value;
   }
 );
 
@@ -113,9 +111,7 @@ onMounted(() => {
     if (!audioEl.value || !audioEl.value.duration) return;
     player.setProgress(audioEl.value.currentTime / audioEl.value.duration);
   });
-  audioEl.value.addEventListener("ended", () => {
-    player.toggle();
-  });
+  audioEl.value.addEventListener("ended", () => { player.toggle(); });
 });
 </script>
 
@@ -126,30 +122,51 @@ onMounted(() => {
   right: 0;
   bottom: var(--nav-h);
   z-index: 15;
-  height: var(--player-h);
-  display: grid;
-  grid-template-columns: 1fr auto 2fr;
+  padding: 0 var(--s-sm);
+  display: flex;
+  justify-content: center;
+}
+
+.window {
+  width: 100%;
+  max-width: var(--col-width);
+  background: var(--c-surface);
+  border: var(--border-raised);
+}
+
+.title-bar {
+  background: var(--c-title-bar);
+  color: var(--c-title-text);
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px var(--s-sm);
+}
+
+.body {
+  display: flex;
   align-items: center;
   gap: var(--s-md);
-  padding: 0 var(--s-md);
-  background: var(--c-surface);
-  border-top: 1px solid var(--c-border);
+  padding: var(--s-sm);
 }
 
 .left {
   display: flex;
   align-items: center;
-  gap: var(--s-sm);
+  gap: var(--s-md);
   min-width: 0;
+  flex: 1;
 }
 
 .cover {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--r-sm);
-  overflow: hidden;
-  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: var(--border-sunken);
   background: var(--c-bg);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
 }
 
 .cover img {
@@ -158,88 +175,87 @@ onMounted(() => {
   object-fit: cover;
 }
 
-.info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+.no-cover {
+  font-size: 8px;
+  font-family: "Tahoma", sans-serif;
+  color: var(--c-muted);
+  text-align: center;
+  line-height: 1.2;
 }
 
-.title {
-  font-weight: 600;
-  font-size: 13px;
+.info {
+  min-width: 0;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.info b {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .artist {
-  font-size: 12px;
   color: var(--c-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 11px;
 }
 
-.center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ctrl {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: var(--c-text);
-  color: var(--c-surface);
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: opacity 0.15s;
-}
-
-.ctrl:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.ctrl:not(:disabled):hover {
-  opacity: 0.8;
-}
-
-.right {
-  display: flex;
-  align-items: center;
-  gap: var(--s-sm);
-}
-
-.slider {
-  flex: 1;
-}
-
-.vol {
-  display: none;
-  align-items: center;
-  gap: var(--s-xs);
-  color: var(--c-muted);
-  width: 120px;
+.controls {
   flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
-  .vol {
-    display: flex;
-  }
+.win-btn {
+  background: var(--c-surface);
+  border: var(--border-raised);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 32px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+}
+
+.win-btn:active {
+  border: var(--border-sunken);
+}
+
+.win-btn:disabled {
+  color: #808080;
+  cursor: default;
+}
+
+.sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xs);
+  flex: 1;
+  min-width: 80px;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+  font-size: 10px;
+  font-family: "Tahoma", sans-serif;
+}
+
+.slider-row label {
+  width: 24px;
+  color: var(--c-muted);
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+  height: 14px;
+  cursor: pointer;
 }
 
 @media (max-width: 480px) {
-  .player {
-    grid-template-columns: 1fr auto;
-    gap: var(--s-sm);
-  }
-
-  .right {
+  .sliders {
     display: none;
   }
 }

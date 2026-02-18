@@ -1,9 +1,8 @@
 <template>
-  <section class="view">
-    <div class="intro">
-      <h1>Загрузка</h1>
-      <p>Добавь свой трек в каталог.</p>
-    </div>
+  <section>
+    <h2>:: Upload</h2>
+    <p class="subtitle">Add your track to the catalog.</p>
+    <hr class="groove" />
     <upload-form />
   </section>
 </template>
@@ -13,19 +12,20 @@ import UploadForm from "@/components/UploadForm.vue";
 </script>
 
 <style scoped>
-.view {
-  display: grid;
-  gap: var(--s-md);
-}
-
-.intro h1 {
-  margin: 0 0 var(--s-xs);
-  font-size: 24px;
-}
-
-.intro p {
+h2 {
   margin: 0;
+  font-size: 16px;
+}
+
+.subtitle {
+  margin: var(--s-xs) 0 0;
+  font-size: 12px;
   color: var(--c-muted);
-  font-size: 14px;
+}
+
+.groove {
+  border: none;
+  border-top: var(--border-groove);
+  margin: var(--s-md) 0;
 }
 </style>

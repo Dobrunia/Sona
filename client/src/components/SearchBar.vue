@@ -1,10 +1,10 @@
 <template>
   <div class="search">
-    <v-icon icon="mdi-magnify" size="18" class="icon" />
+    <label for="search">Search:</label>
     <input
+      id="search"
       v-model="query"
       type="text"
-      placeholder="Поиск по названию или исполнителю"
       @input="emitSearch"
     />
   </div>
@@ -26,33 +26,26 @@ function emitSearch() {
   display: flex;
   align-items: center;
   gap: var(--s-sm);
-  padding: 10px var(--s-md);
-  border-radius: var(--r-md);
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  transition: border-color 0.15s;
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 12px;
 }
 
-.search:focus-within {
-  border-color: var(--c-text);
-}
-
-.icon {
-  color: var(--c-muted);
-  flex-shrink: 0;
+label {
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 input {
-  border: none;
-  outline: none;
   flex: 1;
-  font-size: 14px;
+  border: var(--border-sunken);
+  background: var(--c-input-bg);
+  padding: 2px var(--s-sm);
   font-family: var(--font);
+  font-size: 13px;
   color: var(--c-text);
-  background: transparent;
 }
 
-input::placeholder {
-  color: var(--c-muted);
+input:focus {
+  outline: 1px dotted var(--c-text);
 }
 </style>

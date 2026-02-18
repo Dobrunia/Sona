@@ -1,55 +1,36 @@
 <template>
-  <div class="skeleton">
-    <div class="cover"></div>
-    <div class="lines">
-      <div class="line short"></div>
-      <div class="line"></div>
-    </div>
-  </div>
+  <tr class="row">
+    <td class="cell"><div class="block sm"></div></td>
+    <td class="cell"><div class="block"></div></td>
+    <td class="cell"><div class="block short"></div></td>
+    <td class="cell"></td>
+  </tr>
 </template>
 
 <script setup lang="ts"></script>
 
 <style scoped>
-.skeleton {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  align-items: center;
-  gap: var(--s-sm);
-  padding: var(--s-sm);
-  border-radius: var(--r-md);
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
+.cell {
+  padding: var(--s-xs) var(--s-sm);
+  border-bottom: 1px solid #bbb;
 }
 
-.cover {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--r-sm);
-  background: linear-gradient(120deg, #eee 30%, #f7f7f7 50%, #eee 70%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-}
-
-.lines {
-  display: grid;
-  gap: var(--s-sm);
-}
-
-.line {
+.block {
   height: 10px;
-  border-radius: 4px;
-  background: linear-gradient(120deg, #eee 30%, #f7f7f7 50%, #eee 70%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
+  background: #b0b0b0;
+  animation: blink 1s steps(2) infinite;
 }
 
-.line.short {
-  width: 50%;
+.block.sm {
+  width: 24px;
+  height: 24px;
 }
 
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+.block.short {
+  width: 60%;
+}
+
+@keyframes blink {
+  50% { opacity: 0.4; }
 }
 </style>

@@ -1,34 +1,39 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
-
 :root {
-  --font: "Space Grotesk", system-ui, sans-serif;
+  --font: "Times New Roman", "Georgia", serif;
+  --font-mono: "Courier New", monospace;
 
-  --c-bg: #f4f4f2;
-  --c-surface: #ffffff;
-  --c-text: #111111;
-  --c-muted: #777777;
-  --c-border: rgba(0, 0, 0, 0.08);
-  --c-accent: #ff6b4a;
+  --c-bg: #c0c0c0;
+  --c-surface: #d4d0c8;
+  --c-window: #ece9d8;
+  --c-text: #000000;
+  --c-muted: #444444;
+  --c-link: #0000ee;
+  --c-link-visited: #551a8b;
+  --c-accent: #000080;
+  --c-title-bar: linear-gradient(to right, #0a246a, #3a6ea5);
+  --c-title-text: #ffffff;
+  --c-white: #ffffff;
+  --c-input-bg: #ffffff;
+  --c-highlight: #0a246a;
 
-  --s-xs: 4px;
-  --s-sm: 8px;
-  --s-md: 16px;
-  --s-lg: 24px;
-  --s-xl: 40px;
+  --border-raised: 2px outset #d4d0c8;
+  --border-sunken: 2px inset #d4d0c8;
+  --border-groove: 2px groove #d4d0c8;
+  --border-thin: 1px solid #808080;
 
-  --r-sm: 8px;
-  --r-md: 14px;
-  --r-lg: 20px;
+  --s-xs: 2px;
+  --s-sm: 4px;
+  --s-md: 8px;
+  --s-lg: 12px;
+  --s-xl: 16px;
 
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-
-  --header-h: 56px;
-  --player-h: 72px;
-  --nav-h: 56px;
-  --col-width: 680px;
+  --header-h: 32px;
+  --player-h: 80px;
+  --nav-h: 36px;
+  --col-width: 640px;
 
   font-family: var(--font);
+  font-size: 14px;
   color: var(--c-text);
   background: var(--c-bg);
 }
@@ -39,11 +44,11 @@
 
 body {
   margin: 0;
-  min-height: 100dvh;
+  min-height: 100vh;
 }
 
 #app {
-  min-height: 100dvh;
+  min-height: 100vh;
 }
 
 .v-application {

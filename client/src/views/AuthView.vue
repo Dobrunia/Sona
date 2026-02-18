@@ -1,14 +1,21 @@
 <template>
   <div class="page">
-    <div class="card">
-      <div class="brand">
-        <img src="/icon.svg" alt="Sona" class="logo" />
-        <div>
-          <h1>Sona</h1>
-          <p>Авторизуйся, чтобы продолжить.</p>
-        </div>
+    <div class="window">
+      <div class="title-bar">
+        <img src="/icon.svg" alt="Sona" class="icon" />
+        <span>Welcome to Sona</span>
       </div>
-      <auth-panel @done="noop" />
+      <div class="body">
+        <p><b>Sona Music Service</b></p>
+        <hr />
+        <p>Please sign in to continue.</p>
+        <auth-panel @done="noop" />
+        <hr />
+        <p class="footer">
+          Best viewed with <b>Netscape Navigator 4.0</b> or higher.<br />
+          &copy; 2026 Sona Music. All rights reserved.
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -21,41 +28,55 @@ function noop() {}
 
 <style scoped>
 .page {
-  min-height: 100dvh;
+  min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: var(--s-lg) var(--s-md);
-  background: var(--c-bg);
+  padding: var(--s-xl);
+  background: #008080;
 }
 
-.card {
-  width: min(420px, 100%);
+.window {
+  width: min(400px, 100%);
   background: var(--c-surface);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--c-border);
-  padding: var(--s-lg);
+  border: var(--border-raised);
 }
 
-.brand {
+.title-bar {
+  background: var(--c-title-bar);
+  color: var(--c-title-text);
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 3px var(--s-sm);
   display: flex;
   align-items: center;
   gap: var(--s-sm);
-  margin-bottom: var(--s-lg);
 }
 
-.logo {
-  width: 40px;
-  height: 40px;
+.icon {
+  width: 16px;
+  height: 16px;
+  filter: brightness(10);
 }
 
-h1 {
-  margin: 0;
-  font-size: 20px;
-}
-
-p {
-  margin: var(--s-xs) 0 0;
-  color: var(--c-muted);
+.body {
+  padding: var(--s-lg);
   font-size: 13px;
+}
+
+.body hr {
+  border: none;
+  border-top: var(--border-groove);
+  margin: var(--s-md) 0;
+}
+
+.body p {
+  margin: var(--s-sm) 0;
+}
+
+.footer {
+  font-size: 11px;
+  color: var(--c-muted);
+  text-align: center;
 }
 </style>

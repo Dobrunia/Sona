@@ -20,12 +20,13 @@ import PlayerBar from "@/components/PlayerBar.vue";
 <style scoped>
 .main {
   padding-top: var(--header-h) !important;
-  padding-bottom: calc(var(--player-h) + var(--nav-h) + var(--s-md));
+  padding-bottom: calc(var(--player-h) + var(--nav-h) + var(--s-xl));
+  background: var(--c-bg);
 }
 
 .col {
   max-width: var(--col-width);
   margin: 0 auto;
-  padding: var(--s-lg) var(--s-md);
+  padding: var(--s-md);
 }
 </style>

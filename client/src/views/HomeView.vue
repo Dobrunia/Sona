@@ -1,10 +1,10 @@
 <template>
-  <section class="view">
-    <div class="intro">
-      <h1>Лента</h1>
-      <p>Свежие загрузки от сообщества.</p>
-    </div>
+  <section>
+    <h2>:: Feed</h2>
+    <p class="subtitle">Latest uploads from the community.</p>
+    <hr class="groove" />
     <search-bar @update="setSearch" />
+    <br />
     <track-list :tracks="items" :loading="loading" :error="Boolean(error)" />
     <pagination-controls
       v-if="pageInfo"
@@ -54,19 +54,20 @@ function setPage(value: number) { page.value = value; refetch(); }
 </script>
 
 <style scoped>
-.view {
-  display: grid;
-  gap: var(--s-md);
-}
-
-.intro h1 {
-  margin: 0 0 var(--s-xs);
-  font-size: 24px;
-}
-
-.intro p {
+h2 {
   margin: 0;
+  font-size: 16px;
+}
+
+.subtitle {
+  margin: var(--s-xs) 0 0;
+  font-size: 12px;
   color: var(--c-muted);
-  font-size: 14px;
+}
+
+.groove {
+  border: none;
+  border-top: var(--border-groove);
+  margin: var(--s-md) 0;
 }
 </style>

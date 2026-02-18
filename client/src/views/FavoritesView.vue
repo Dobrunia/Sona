@@ -1,9 +1,8 @@
 <template>
-  <section class="view">
-    <div class="intro">
-      <h1>Избранное</h1>
-      <p>Треки, которые тебе нравятся.</p>
-    </div>
+  <section>
+    <h2>:: Favorites</h2>
+    <p class="subtitle">Tracks you liked.</p>
+    <hr class="groove" />
     <track-list :tracks="items" :loading="loading" :error="Boolean(error)" />
     <pagination-controls
       v-if="pageInfo"
@@ -43,19 +42,20 @@ function setPage(value: number) {
 </script>
 
 <style scoped>
-.view {
-  display: grid;
-  gap: var(--s-md);
-}
-
-.intro h1 {
-  margin: 0 0 var(--s-xs);
-  font-size: 24px;
-}
-
-.intro p {
+h2 {
   margin: 0;
+  font-size: 16px;
+}
+
+.subtitle {
+  margin: var(--s-xs) 0 0;
+  font-size: 12px;
   color: var(--c-muted);
-  font-size: 14px;
+}
+
+.groove {
+  border: none;
+  border-top: var(--border-groove);
+  margin: var(--s-md) 0;
 }
 </style>
