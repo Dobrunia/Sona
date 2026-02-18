@@ -23,7 +23,7 @@ cd ./server
 cp .env.example .env
 ```
 
-Fill in required auth and S3 settings in `/Users/dobruniakostrigin/front-end/Sona/server/.env`.
+Fill in required auth and S3 settings in `./server/.env`.
 
 3. Install dependencies:
 
@@ -55,12 +55,12 @@ pnpm run dev
 ### Setup
 
 ```bash
-cd /Users/dobruniakostrigin/front-end/Sona/client
+cd ./client
 cp .env.example .env
 pnpm install
 ```
 
-Set `VITE_GOOGLE_CLIENT_ID` in `/Users/dobruniakostrigin/front-end/Sona/client/.env` if you want Google button login.
+Set `VITE_GOOGLE_CLIENT_ID` in `./client/.env` if you want Google button login.
 
 ### Run client
 
