@@ -1,7 +1,7 @@
 import type { Request } from "express";
-import { prisma } from "@db/prisma.js";
-import { config } from "@core/config.js";
-import { verifyAccessToken } from "@auth/auth.js";
+import { prisma } from "../db/prisma.js";
+import { config } from "../core/config.js";
+import { verifyAccessToken } from "./auth.js";
 
 export type ContextUser = {
   id: number;

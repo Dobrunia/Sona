@@ -29,9 +29,11 @@ function remove(id: string) {
   display: grid;
   gap: 10px;
   z-index: 100;
+  pointer-events: none;
 }
 
 .toast {
+  pointer-events: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;

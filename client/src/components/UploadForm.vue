@@ -78,6 +78,12 @@ import { REQUEST_TRACK_UPLOAD, CREATE_TRACK } from "@/graphql/mutations";
 import { ALLOWED_AUDIO_MIME, ALLOWED_IMAGE_MIME, LIMITS } from "@/constants";
 import { useToastStore } from "@/stores/toast";
 import { useOptimisticMutation } from "@/hooks/useOptimisticMutation";
+import type {
+  CreateTrackMutation,
+  CreateTrackMutationVariables,
+  RequestTrackUploadMutation,
+  RequestTrackUploadMutationVariables
+} from "@/graphql/generated";
 
 const form = ref({
   title: "",
@@ -93,12 +99,16 @@ const coverProgress = ref(0);
 const error = ref("");
 const toast = useToastStore();
 
-const { mutate: requestUpload } = useMutation(REQUEST_TRACK_UPLOAD);
-const { mutate: createTrack } = useMutation(CREATE_TRACK);
-const { run: runCreateTrack } = useOptimisticMutation<
-  { input: { title: string; artist: string | null; fileKey: string; fileSize: number; coverKey: string | null; coverSize: number | null } },
-  { createTrack: { id: string; title: string; artist?: string | null; duration?: number | null; coverUrl?: string | null } }
->(createTrack);
+const { mutate: requestUpload } = useMutation<
+  RequestTrackUploadMutation,
+  RequestTrackUploadMutationVariables
+>(REQUEST_TRACK_UPLOAD);
+const { mutate: createTrack } = useMutation<CreateTrackMutation, CreateTrackMutationVariables>(
+  CREATE_TRACK
+);
+const { run: runCreateTrack } = useOptimisticMutation<CreateTrackMutationVariables, CreateTrackMutation>(
+  createTrack
+);
 
 const NEW_TRACK_FRAGMENT = gql`
   fragment NewTrack on Track {

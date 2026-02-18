@@ -1,0 +1,97 @@
+query Tracks($search: String, $page: Int, $pageSize: Int) {
+  tracks(search: $search, page: $page, pageSize: $pageSize) {
+    items {
+      id
+      title
+      artist
+      duration
+      coverUrl
+      likedByMe
+    }
+    pageInfo {
+      page
+      pageSize
+      total
+      hasNextPage
+    }
+  }
+}
+
+query Favorites($page: Int, $pageSize: Int) {
+  favorites(page: $page, pageSize: $pageSize) {
+    items {
+      id
+      title
+      artist
+      duration
+      coverUrl
+      likedByMe
+    }
+    pageInfo {
+      page
+      pageSize
+      total
+      hasNextPage
+    }
+  }
+}
+
+query StreamUrl($trackId: ID!) {
+  streamUrl(trackId: $trackId)
+}
+
+mutation RequestTrackUpload($input: TrackUploadRequestInput!) {
+  requestTrackUpload(input: $input) {
+    fileKey
+    uploadUrl
+    coverKey
+    coverUploadUrl
+    expiresInSeconds
+  }
+}
+
+mutation CreateTrack($input: CreateTrackInput!) {
+  createTrack(input: $input) {
+    id
+    title
+    artist
+    duration
+    coverUrl
+  }
+}
+
+mutation ToggleLike($trackId: ID!) {
+  toggleLike(trackId: $trackId)
+}
+
+mutation LoginWithGoogle($idToken: String!) {
+  loginWithGoogle(idToken: $idToken) {
+    accessToken
+    refreshToken
+    expiresInSeconds
+    user {
+      id
+      email
+      name
+      avatar
+    }
+  }
+}
+
+mutation RefreshTokens($refreshToken: String!) {
+  refreshTokens(refreshToken: $refreshToken) {
+    accessToken
+    refreshToken
+    expiresInSeconds
+    user {
+      id
+      email
+      name
+      avatar
+    }
+  }
+}
+
+mutation Logout($refreshToken: String!) {
+  logout(refreshToken: $refreshToken)
+}

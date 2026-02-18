@@ -8,7 +8,7 @@ import { typeDefs, resolvers } from "@graphql/schema.js";
 import { buildContext } from "@auth/context.js";
 import { attachPresenceServer } from "@ws/ws.js";
 import { config, assertConfig } from "@core/config.js";
-import { prisma } from "@db/prisma.js";
+import { prisma } from "./db/prisma.js";
 import { formatGraphQLError } from "@core/errors.js";
 import { checkS3Connection } from "@storage/storage.js";
 import { logError, logInfo, logWarn } from "@core/logger.js";

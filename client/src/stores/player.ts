@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { apolloClient } from "@/plugins/apollo";
 import { STREAM_URL_QUERY } from "@/graphql/queries";
+import type { StreamUrlQuery, StreamUrlQueryVariables } from "@/graphql/generated";
 
 export type Track = {
   id: number;
@@ -22,7 +23,7 @@ export const usePlayerStore = defineStore("player", {
   actions: {
     async play(track: Track) {
       this.current = track;
-      const { data } = await apolloClient.query({
+      const { data } = await apolloClient.query<StreamUrlQuery, StreamUrlQueryVariables>({
         query: STREAM_URL_QUERY,
         variables: { trackId: String(track.id) },
         fetchPolicy: "no-cache"

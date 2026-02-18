@@ -1,0 +1,100 @@
+scalar DateTime
+
+type User {
+  id: ID!
+  email: String!
+  name: String
+  avatar: String
+  createdAt: DateTime!
+}
+
+type Track {
+  id: ID!
+  title: String!
+  artist: String
+  fileKey: String!
+  coverKey: String
+  duration: Int!
+  fileSize: Int!
+  coverSize: Int
+  playCount: Int!
+  createdAt: DateTime!
+  uploadedBy: User!
+  likedByMe: Boolean!
+  coverUrl: String
+}
+
+type Like {
+  id: ID!
+  userId: ID!
+  trackId: ID!
+  createdAt: DateTime!
+}
+
+type PageInfo {
+  page: Int!
+  pageSize: Int!
+  total: Int!
+  hasNextPage: Boolean!
+}
+
+type TrackConnection {
+  items: [Track!]!
+  pageInfo: PageInfo!
+}
+
+type AuthPayload {
+  accessToken: String!
+  refreshToken: String!
+  expiresInSeconds: Int!
+  user: User!
+}
+
+input TrackUploadRequestInput {
+  title: String!
+  artist: String
+  fileName: String!
+  fileSize: Int!
+  fileMimeType: String!
+  coverFileName: String
+  coverSize: Int
+  coverMimeType: String
+}
+
+type TrackUploadPayload {
+  fileKey: String!
+  uploadUrl: String!
+  coverKey: String
+  coverUploadUrl: String
+  expiresInSeconds: Int!
+}
+
+input CreateTrackInput {
+  title: String!
+  artist: String
+  fileKey: String!
+  fileSize: Int!
+  coverKey: String
+  coverSize: Int
+}
+
+type Query {
+  health: String!
+  me: User
+  track(id: ID!): Track
+  tracks(search: String, page: Int = 1, pageSize: Int = 10): TrackConnection!
+  favorites(page: Int = 1, pageSize: Int = 20): TrackConnection!
+  streamUrl(trackId: ID!): String!
+}
+
+type Mutation {
+  loginWithGoogle(idToken: String!): AuthPayload!
+  refreshTokens(refreshToken: String!): AuthPayload!
+  logout(refreshToken: String!): Boolean!
+
+  requestTrackUpload(input: TrackUploadRequestInput!): TrackUploadPayload!
+  createTrack(input: CreateTrackInput!): Track!
+
+  toggleLike(trackId: ID!): Boolean!
+  incrementPlayCount(trackId: ID!): Track!
+}

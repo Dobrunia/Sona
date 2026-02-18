@@ -30,6 +30,7 @@ import { TOGGLE_LIKE } from "@/graphql/mutations";
 import { useToastStore } from "@/stores/toast";
 import { useAuthStore } from "@/stores/auth";
 import { useOptimisticMutation } from "@/hooks/useOptimisticMutation";
+import type { ToggleLikeMutation, ToggleLikeMutationVariables } from "@/graphql/generated";
 
 const props = defineProps<{ track: Track }>();
 const player = usePlayerStore();
@@ -42,8 +43,8 @@ const liked = computed(() => {
   return Boolean(props.track.likedByMe);
 });
 
-const { mutate } = useMutation(TOGGLE_LIKE);
-const { run } = useOptimisticMutation<{ trackId: string }, { toggleLike: boolean }>(mutate);
+const { mutate } = useMutation<ToggleLikeMutation, ToggleLikeMutationVariables>(TOGGLE_LIKE);
+const { run } = useOptimisticMutation<ToggleLikeMutationVariables, ToggleLikeMutation>(mutate);
 
 async function toggleLike() {
   if (!auth.accessToken) {

@@ -22,13 +22,17 @@ import TrackList from "@/components/TrackList.vue";
 import PaginationControls from "@/components/PaginationControls.vue";
 import { FAVORITES_QUERY } from "@/graphql/queries";
 import { useRefreshStore } from "@/stores/refresh";
+import type { FavoritesQuery, FavoritesQueryVariables } from "@/graphql/generated";
 
 const page = ref(1);
 const refresh = useRefreshStore();
-const { result, loading, error, refetch } = useQuery(FAVORITES_QUERY, {
-  page: page.value,
-  pageSize: 20
-});
+const { result, loading, error, refetch } = useQuery<FavoritesQuery, FavoritesQueryVariables>(
+  FAVORITES_QUERY,
+  {
+    page: page.value,
+    pageSize: 20
+  }
+);
 
 const items = computed(() => result.value?.favorites?.items ?? []);
 const pageInfo = computed(() => result.value?.favorites?.pageInfo ?? null);

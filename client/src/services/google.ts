@@ -1,7 +1,7 @@
-import { useAuthStore } from "@/stores/auth";
-import { useToastStore } from "@/stores/toast";
 import { apolloClient } from "@/plugins/apollo";
 import { LOGIN_WITH_GOOGLE } from "@/graphql/mutations";
+import { useAuthStore } from "@/stores/auth";
+import { useToastStore } from "@/stores/toast";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
@@ -21,11 +21,16 @@ function loadGoogleScript() {
   return scriptPromise;
 }
 
-export async function initGoogleLogin(buttonId: string) {
-  if (!CLIENT_ID) return;
+export async function initGoogleLogin(buttonId: string): Promise<boolean> {
+  if (!CLIENT_ID) {
+    return false;
+  }
+
   await loadGoogleScript();
 
-  if (!window.google?.accounts?.id) return;
+  if (!window.google?.accounts?.id) {
+    return false;
+  }
 
   window.google.accounts.id.initialize({
     client_id: CLIENT_ID,
@@ -48,9 +53,14 @@ export async function initGoogleLogin(buttonId: string) {
     }
   });
 
-  window.google.accounts.id.renderButton(document.getElementById(buttonId), {
+  const container = document.getElementById(buttonId);
+  if (!container) return false;
+
+  window.google.accounts.id.renderButton(container, {
     theme: "outline",
     size: "large",
     width: 260
   });
+
+  return true;
 }

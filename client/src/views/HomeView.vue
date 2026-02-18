@@ -25,19 +25,23 @@ import PaginationControls from "@/components/PaginationControls.vue";
 import { TRACKS_QUERY } from "@/graphql/queries";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useRefreshStore } from "@/stores/refresh";
+import type { TracksQuery, TracksQueryVariables } from "@/graphql/generated";
 
 const search = ref("");
 const page = ref(1);
 const refresh = useRefreshStore();
 const debouncedSearch = useDebouncedValue(() => search.value, 350);
 
-const variables = computed(() => ({
+const variables = computed<TracksQueryVariables>(() => ({
   search: debouncedSearch.value || null,
   page: page.value,
   pageSize: 10
 }));
 
-const { result, loading, error, refetch } = useQuery(TRACKS_QUERY, variables);
+const { result, loading, error, refetch } = useQuery<TracksQuery, TracksQueryVariables>(
+  TRACKS_QUERY,
+  variables
+);
 
 const items = computed(() => result.value?.tracks?.items ?? []);
 const pageInfo = computed(() => result.value?.tracks?.pageInfo ?? null);

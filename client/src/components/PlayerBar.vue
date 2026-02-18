@@ -1,13 +1,11 @@
 <template>
-  <section class="player">
+  <v-sheet class="player" elevation="0">
     <audio ref="audioEl" preload="metadata"></audio>
     <div class="track">
-      <div class="cover">
+      <v-avatar size="56" class="cover">
         <img v-if="current?.coverUrl" :src="current.coverUrl" :alt="current.title" />
-        <div v-else class="fallback">
-          <img src="/icon.svg" alt="Sona" />
-        </div>
-      </div>
+        <img v-else src="/icon.svg" alt="Sona" />
+      </v-avatar>
       <div>
         <div class="title">{{ current?.title ?? "Не выбрано" }}</div>
         <div class="artist">{{ current?.artist ?? "Добавьте трек" }}</div>
@@ -26,19 +24,13 @@
       <v-btn icon="mdi-skip-next" variant="text"></v-btn>
     </div>
     <div class="meta">
-      <v-slider
-        v-model="progress"
-        hide-details
-        :min="0"
-        :max="100"
-        class="progress"
-      ></v-slider>
+      <v-slider v-model="progress" hide-details :min="0" :max="100" class="progress"></v-slider>
       <div class="volume">
         <v-icon icon="mdi-volume-high"></v-icon>
         <v-slider v-model="volume" hide-details :min="0" :max="100"></v-slider>
       </div>
     </div>
-  </section>
+  </v-sheet>
 </template>
 
 <script setup lang="ts">
@@ -117,47 +109,20 @@ onMounted(() => {
 
 <style scoped>
 .player {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  padding: 16px 20px;
-  background: #ffffff;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
   position: sticky;
-  bottom: 64px;
-  z-index: 12;
+  bottom: 56px;
+  z-index: 10;
+  display: grid;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
 }
 
 .track {
   display: flex;
   align-items: center;
-  gap: 14px;
-}
-
-.cover {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  overflow: hidden;
-  background: linear-gradient(135deg, #111111, #ff6b4a);
-}
-
-.cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.fallback {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-}
-
-.fallback img {
-  width: 24px;
-  height: 24px;
+  gap: 12px;
 }
 
 .title {
@@ -173,7 +138,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .play {
@@ -187,10 +152,6 @@ onMounted(() => {
   gap: 8px;
 }
 
-.progress {
-  margin-top: -8px;
-}
-
 .volume {
   display: none;
   align-items: center;
@@ -202,7 +163,7 @@ onMounted(() => {
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     bottom: 0;
-    padding: 16px 64px;
+    padding: 12px 32px;
   }
 
   .volume {
