@@ -67,8 +67,8 @@ onMounted(() => {
 
 async function login() {
   try {
-    const { data } = await loginMutation({ idToken: token.value });
-    const payload = data?.loginWithGoogle;
+    const result = await loginMutation({ idToken: token.value });
+    const payload = result?.data?.loginWithGoogle;
     if (!payload) throw new Error("login failed");
     auth.setSession(payload.accessToken, payload.refreshToken, payload.user ?? null);
     token.value = "";

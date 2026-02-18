@@ -1,6 +1,7 @@
 import { ApolloClient, InMemoryCache, HttpLink, from } from "@apollo/client/core";
 import { onError } from "@apollo/client/link/error";
 import { setContext } from "@apollo/client/link/context";
+import { fromPromise } from "@apollo/client/link/utils";
 import { useAuthStore } from "@/stores/auth";
 import { refreshTokens } from "@/services/auth";
 
@@ -35,23 +36,21 @@ const errorLink = onError(({ graphQLErrors, operation, forward }) => {
     });
   }
 
-  return new Promise((resolve) => {
-    refreshPromise?.then((newToken) => {
-      const authStore = useAuthStore();
-      if (!newToken) {
-        authStore.clear();
-        return resolve(forward(operation));
+  return fromPromise(refreshPromise).flatMap((newToken) => {
+    const authStore = useAuthStore();
+    if (!newToken) {
+      authStore.clear();
+      return forward(operation);
+    }
+
+    operation.setContext(({ headers = {} }) => ({
+      headers: {
+        ...headers,
+        Authorization: `Bearer ${newToken}`
       }
+    }));
 
-      operation.setContext(({ headers = {} }) => ({
-        headers: {
-          ...headers,
-          Authorization: `Bearer ${newToken}`
-        }
-      }));
-
-      resolve(forward(operation));
-    });
+    return forward(operation);
   });
 });
 

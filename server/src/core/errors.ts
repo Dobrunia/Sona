@@ -1,4 +1,4 @@
-import { GraphQLError } from "graphql";
+import type { GraphQLFormattedError, GraphQLError } from "graphql";
 
 export type ErrorCode =
   | "BAD_USER_INPUT"
@@ -15,12 +15,6 @@ export class AppError extends Error {
     super(message);
     this.code = code;
   }
-}
-
-export function gqlError(message: string, code: ErrorCode) {
-  return new GraphQLError(message, {
-    extensions: { code }
-  });
 }
 
 export function badInput(message: string) {
@@ -47,16 +41,33 @@ export function internalError(message: string) {
   return new AppError(message, "INTERNAL");
 }
 
-export function formatGraphQLError(error: GraphQLError) {
-  const original = error.originalError;
+export function formatGraphQLError(
+  formattedError: GraphQLFormattedError,
+  error: unknown
+): GraphQLFormattedError {
+  const original = (error as GraphQLError | undefined)?.originalError;
 
   if (original instanceof AppError) {
-    return gqlError(original.message, original.code);
+    return {
+      ...formattedError,
+      message: original.message,
+      extensions: {
+        ...formattedError.extensions,
+        code: original.code
+      }
+    };
   }
 
-  if (error.extensions?.code) {
-    return error;
+  if (formattedError.extensions?.code) {
+    return formattedError;
   }
 
-  return gqlError("Internal error", "INTERNAL");
+  return {
+    ...formattedError,
+    message: "Internal error",
+    extensions: {
+      ...formattedError.extensions,
+      code: "INTERNAL"
+    }
+  };
 }

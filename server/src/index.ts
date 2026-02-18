@@ -1,9 +1,9 @@
 import "dotenv/config";
 import http from "http";
-import express from "express";
+import express, { type Request } from "express";
 import cors from "cors";
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
+import { expressMiddleware } from "@as-integrations/express4";
 import { typeDefs, resolvers } from "@graphql/schema.js";
 import { buildContext } from "@auth/context.js";
 import { attachPresenceServer } from "@ws/ws.js";
@@ -60,7 +60,7 @@ async function start() {
     "/graphql",
     express.json(),
     expressMiddleware(apollo, {
-      context: async ({ req }) => buildContext(req)
+      context: async ({ req }: { req: Request }) => buildContext(req)
     })
   );
 

@@ -73,6 +73,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useMutation } from "@vue/apollo-composable";
+import { gql } from "@apollo/client/core";
 import { REQUEST_TRACK_UPLOAD, CREATE_TRACK } from "@/graphql/mutations";
 import { ALLOWED_AUDIO_MIME, ALLOWED_IMAGE_MIME, LIMITS } from "@/constants";
 import { useToastStore } from "@/stores/toast";
@@ -98,6 +99,17 @@ const { run: runCreateTrack } = useOptimisticMutation<
   { input: { title: string; artist: string | null; fileKey: string; fileSize: number; coverKey: string | null; coverSize: number | null } },
   { createTrack: { id: string; title: string; artist?: string | null; duration?: number | null; coverUrl?: string | null } }
 >(createTrack);
+
+const NEW_TRACK_FRAGMENT = gql`
+  fragment NewTrack on Track {
+    id
+    title
+    artist
+    duration
+    coverUrl
+    likedByMe
+  }
+`;
 
 function formatBytes(value: number) {
   const mb = value / (1024 * 1024);
@@ -190,7 +202,7 @@ async function handleSubmit() {
   coverProgress.value = 0;
 
   try {
-    const { data } = await requestUpload({
+    const result = await requestUpload({
       input: {
         title: form.value.title,
         artist: form.value.artist || null,
@@ -203,7 +215,7 @@ async function handleSubmit() {
       }
     });
 
-    const payload = data?.requestTrackUpload;
+    const payload = result?.data?.requestTrackUpload;
     if (!payload) {
       throw new Error("Upload request failed");
     }
@@ -243,16 +255,7 @@ async function handleSubmit() {
               coverUrl: created.coverUrl,
               likedByMe: false
             },
-            fragment: `
-              fragment NewTrack on Track {
-                id
-                title
-                artist
-                duration
-                coverUrl
-                likedByMe
-              }
-            `
+            fragment: NEW_TRACK_FRAGMENT
           });
 
           cache.modify({

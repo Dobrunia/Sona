@@ -11,6 +11,9 @@ importers:
       '@apollo/server':
         specifier: ^5.4.0
         version: 5.4.0(graphql@16.12.0)
+      '@as-integrations/express4':
+        specifier: ^1.1.2
+        version: 1.1.2(@apollo/server@5.4.0(graphql@16.12.0))(express@4.22.1)
       '@aws-sdk/client-s3':
         specifier: ^3.716.0
         version: 3.992.0
@@ -154,6 +157,13 @@ packages:
   '@apollo/utils.withrequired@3.0.0':
     resolution: {integrity: sha512-aaxeavfJ+RHboh7c2ofO5HHtQobGX4AgUujXP4CXpREHp9fQ9jPi6K9T1jrAKe7HIipoP0OJ1gd6JamSkFIpvA==}
     engines: {node: '>=16'}
+
+  '@as-integrations/express4@1.1.2':
+    resolution: {integrity: sha512-PGeMcwoOKdYnZ4LtsmM7aLNoel3tbK8wKnfyahdRau1qb7wLbuaXB35zg3w34Ov4bm3WJtO3yzd8Bw5jVE+aIQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@apollo/server': ^4.0.0 || ^5.0.0
+      express: ^4.0.0
 
   '@aws-crypto/crc32@5.2.0':
     resolution: {integrity: sha512-nLbCWqQNgUiwwtFsen1AdzAtvuLRsQS8rYgMuxCrdKf9kOssamGLuPwyTY9wyYblNr9+1XM8v6zoDTPPSIeANg==}
@@ -1529,6 +1539,11 @@ snapshots:
       graphql: 16.12.0
 
   '@apollo/utils.withrequired@3.0.0': {}
+
+  '@as-integrations/express4@1.1.2(@apollo/server@5.4.0(graphql@16.12.0))(express@4.22.1)':
+    dependencies:
+      '@apollo/server': 5.4.0(graphql@16.12.0)
+      express: 4.22.1
 
   '@aws-crypto/crc32@5.2.0':
     dependencies:
