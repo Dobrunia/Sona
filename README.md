@@ -49,3 +49,21 @@ pnpm run dev
 - GraphQL: `http://localhost:4000/graphql`
 - Health: `http://localhost:4000/health`
 - WebSocket: `ws://localhost:4000/ws`
+
+## Client (local)
+
+### Setup
+
+```bash
+cd /Users/dobruniakostrigin/front-end/Sona/client
+cp .env.example .env
+pnpm install
+```
+
+Set `VITE_GOOGLE_CLIENT_ID` in `/Users/dobruniakostrigin/front-end/Sona/client/.env` if you want Google button login.
+
+### Run client
+
+```bash
+pnpm run dev
+```

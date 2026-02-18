@@ -10,11 +10,38 @@ import { attachPresenceServer } from "@ws/ws.js";
 import { config, assertConfig } from "@core/config.js";
 import { prisma } from "@db/prisma.js";
 import { formatGraphQLError } from "@core/errors.js";
+import { checkS3Connection } from "@storage/storage.js";
+import { logError, logInfo, logWarn } from "@core/logger.js";
 
 const PORT = config.port;
 
+async function checkDependencies() {
+  try {
+    await prisma.$connect();
+    await prisma.$queryRaw`SELECT 1`;
+    logInfo("MySQL connected");
+  } catch (error) {
+    logError("MySQL connection failed", error);
+    throw error;
+  }
+
+  try {
+    await checkS3Connection();
+    logInfo("S3 connected");
+  } catch (error) {
+    logError("S3 connection failed", error);
+    throw error;
+  }
+
+  if (!config.jwtSecret || !config.googleClientId) {
+    logWarn("Auth config missing; login may not work");
+  }
+}
+
 async function start() {
   assertConfig();
+  await checkDependencies();
+
   const app = express();
   const server = http.createServer(app);
 
@@ -40,11 +67,11 @@ async function start() {
   attachPresenceServer(server, prisma);
 
   server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    logInfo(`Server running on http://localhost:${PORT}`);
   });
 }
 
 start().catch((error) => {
-  console.error("Failed to start server", error);
+  logError("Failed to start server", error);
   process.exit(1);
 });

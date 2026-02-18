@@ -2,7 +2,8 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
-  HeadObjectCommand
+  HeadObjectCommand,
+  ListBucketsCommand
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { config } from "@core/config.js";
@@ -57,6 +58,10 @@ export async function headObject(key: string) {
     contentType: result.ContentType ?? null,
     contentLength: result.ContentLength ?? null
   };
+}
+
+export async function checkS3Connection() {
+  await s3.send(new ListBucketsCommand({}));
 }
 
 export function toPublicUrl(key: string) {

@@ -18,3 +18,7 @@ body {
 #app {
   min-height: 100vh;
 }
+
+.v-application {
+  font-family: "Space Grotesk", system-ui, sans-serif !important;
+}
