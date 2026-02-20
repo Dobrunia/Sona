@@ -120,7 +120,7 @@ function validate() {
   if (audioFile.value.size > LIMITS.maxTrackSizeBytes) return "File too large (max 20MB)";
   if (coverFile.value) {
     if (!ALLOWED_IMAGE_MIME.includes(coverFile.value.type)) return "Cover must be jpg/png/webp";
-    if (coverFile.value.size > LIMITS.maxCoverSizeBytes) return "Cover too large (max 2MB)";
+    if (coverFile.value.size > LIMITS.maxCoverSizeBytes) return "Cover too large (max 10MB)";
   }
   return "";
 }
@@ -220,7 +220,8 @@ async function handleSubmit() {
     form.value = { title: "", artist: "" };
     audioFile.value = null;
     coverFile.value = null;
-  } catch {
+  } catch (err) {
+    console.error("[UploadForm]", err);
     error.value = "Upload failed";
     toast.push("Upload failed", "error");
   } finally {

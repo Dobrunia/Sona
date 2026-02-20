@@ -1,9 +1,12 @@
 <template>
   <tr class="row" @dblclick="play">
     <td class="cell cover-cell">
-      <div class="cover">
-        <img v-if="track.coverUrl" :src="track.coverUrl" :alt="track.title" />
-        <span v-else class="no-img">-</span>
+      <div class="vinyl" :class="{ spinning: isThisPlaying }">
+        <div class="grooves"></div>
+        <div class="label">
+          <img v-if="track.coverUrl" :src="track.coverUrl" :alt="track.title" />
+        </div>
+        <div class="hole"></div>
       </div>
     </td>
     <td class="cell title-cell">
@@ -36,6 +39,10 @@ const player = usePlayerStore();
 const toast = useToastStore();
 const auth = useAuthStore();
 const localLiked = ref<boolean | null>(null);
+
+const isThisPlaying = computed(
+  () => player.current?.id === props.track.id && player.isPlaying
+);
 
 const liked = computed(() => {
   if (localLiked.value !== null) return localLiked.value;
@@ -124,28 +131,70 @@ function play() {
 }
 
 .cover-cell {
-  width: 28px;
+  width: 36px;
 }
 
-.cover {
-  width: 24px;
-  height: 24px;
-  border: 1px solid #999;
-  background: var(--c-bg);
+.vinyl {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #111;
+  animation: spin 2s linear infinite;
+  animation-play-state: paused;
+}
+
+.vinyl.spinning {
+  animation-play-state: running;
+}
+
+.grooves {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(
+      circle at center,
+      transparent 0px,
+      transparent 1px,
+      rgba(255, 255, 255, 0.04) 1.5px,
+      transparent 2px
+    );
+}
+
+.label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
   overflow: hidden;
-  display: grid;
-  place-items: center;
+  background: #222;
 }
 
-.cover img {
+.label img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.no-img {
-  font-size: 10px;
-  color: #999;
+.hole {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--c-window);
+  border: 1px solid #666;
+  z-index: 1;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .title-cell {

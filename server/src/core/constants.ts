@@ -1,6 +1,6 @@
 export const LIMITS = {
   maxTrackSizeBytes: 20 * 1024 * 1024,
-  maxCoverSizeBytes: 2 * 1024 * 1024,
+  maxCoverSizeBytes: 10 * 1024 * 1024,
   maxDurationSeconds: 10 * 60
 };
 

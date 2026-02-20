@@ -8,9 +8,12 @@
       </div>
       <div class="body">
         <div class="left">
-          <div class="cover">
-            <img v-if="current?.coverUrl" :src="current.coverUrl" :alt="current.title" />
-            <span v-else class="no-cover">NO<br/>IMG</span>
+          <div class="vinyl" :class="{ spinning: player.isPlaying && current }">
+            <div class="grooves"></div>
+            <div class="label">
+              <img v-if="current?.coverUrl" :src="current.coverUrl" :alt="current.title" />
+            </div>
+            <div class="hole"></div>
           </div>
           <div class="info">
             <b>{{ current?.title ?? "No track selected" }}</b>
@@ -158,29 +161,68 @@ onMounted(() => {
   flex: 1;
 }
 
-.cover {
-  width: 40px;
-  height: 40px;
-  border: var(--border-sunken);
-  background: var(--c-bg);
+.vinyl {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #111;
   flex-shrink: 0;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
+  animation: spin 2s linear infinite;
+  animation-play-state: paused;
 }
 
-.cover img {
+.vinyl.spinning {
+  animation-play-state: running;
+}
+
+.grooves {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(
+      circle at center,
+      transparent 0px,
+      transparent 1.5px,
+      rgba(255, 255, 255, 0.05) 2px,
+      transparent 2.5px
+    );
+}
+
+.label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  overflow: hidden;
+  background: #222;
+}
+
+.label img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.no-cover {
-  font-size: 8px;
-  font-family: "Tahoma", sans-serif;
-  color: var(--c-muted);
-  text-align: center;
-  line-height: 1.2;
+.hole {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--c-surface);
+  border: 1px solid #666;
+  z-index: 1;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .info {

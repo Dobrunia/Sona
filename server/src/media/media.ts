@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import ffprobePath from "ffprobe-static";
+import ffprobeStatic from "ffprobe-static";
 import { createStreamUrl } from "@storage/storage.js";
 import { badInput } from "@core/errors.js";
 
@@ -15,7 +15,8 @@ function runFfprobe(url: string): Promise<number> {
       url
     ];
 
-    const child = spawn(ffprobePath, args);
+    const bin = typeof ffprobeStatic === "string" ? ffprobeStatic : (ffprobeStatic as any).path;
+    const child = spawn(bin, args);
     let output = "";
     let errorOutput = "";
 
