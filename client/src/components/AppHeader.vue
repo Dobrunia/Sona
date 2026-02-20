@@ -3,7 +3,7 @@
     <div class="title-bar">
       <div class="title">
         <img src="/icon.svg" alt="Sona" class="icon" />
-        <span>Sona Music Service</span>
+        <span>Sona</span>
       </div>
       <div class="controls">
         <span class="online">[{{ presence.count }} online]</span>

@@ -6,7 +6,7 @@
         <span>Welcome to Sona</span>
       </div>
       <div class="body">
-        <p><b>Sona Music Service</b></p>
+        <p><b>Sona</b></p>
         <hr />
         <p>Please sign in to continue.</p>
         <auth-panel @done="noop" />
