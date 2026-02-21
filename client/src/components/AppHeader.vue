@@ -6,7 +6,6 @@
         <span>Sona</span>
       </div>
       <div class="controls">
-        <span class="online">[{{ presence.count }} online]</span>
         <v-menu>
           <template #activator="{ props }">
             <button v-bind="props" class="win-btn sm">
@@ -34,10 +33,8 @@
 import { useMutation } from "@vue/apollo-composable";
 import { LOGOUT } from "@/graphql/mutations";
 import { useAuthStore } from "@/stores/auth";
-import { usePresenceStore } from "@/stores/presence";
 
 const auth = useAuthStore();
-const presence = usePresenceStore();
 const { mutate: logoutMutation, loading } = useMutation(LOGOUT);
 
 async function logout() {
@@ -89,12 +86,6 @@ async function logout() {
   display: flex;
   align-items: center;
   gap: var(--s-md);
-}
-
-.online {
-  font-weight: normal;
-  font-size: 11px;
-  opacity: 0.8;
 }
 
 .win-btn {

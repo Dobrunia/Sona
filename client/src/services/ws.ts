@@ -1,4 +1,11 @@
+import { watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
+
+export type OnlineTrack = {
+  id: number;
+  title: string;
+  artist?: string | null;
+};
 
 export type OnlineUser = {
   id: string | number;
@@ -9,6 +16,7 @@ export type OnlineUser = {
     name?: string | null;
     avatar?: string | null;
   } | null;
+  track: OnlineTrack | null;
 };
 
 type OnlineSnapshot = {
@@ -21,18 +29,32 @@ type WSMessage = OnlineSnapshot;
 
 const WS_URL = import.meta.env.VITE_WS_URL ?? "ws://localhost:4000/ws";
 
+let socket: WebSocket | null = null;
+
+function send(data: unknown) {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(data));
+  }
+}
+
+export function sendNowPlaying(trackId: number | null) {
+  send({ type: "now_playing", trackId });
+}
+
+function identify() {
+  const auth = useAuthStore();
+  if (auth.accessToken) {
+    send({ type: "identify", token: auth.accessToken });
+  }
+}
+
 export function connectPresence(
   onSnapshot: (snapshot: OnlineSnapshot) => void,
   onError: () => void
 ) {
-  const auth = useAuthStore();
-  const socket = new WebSocket(WS_URL);
+  socket = new WebSocket(WS_URL);
 
-  socket.addEventListener("open", () => {
-    if (auth.accessToken) {
-      socket.send(JSON.stringify({ type: "identify", token: auth.accessToken }));
-    }
-  });
+  socket.addEventListener("open", () => identify());
 
   socket.addEventListener("message", (event) => {
     try {
@@ -46,6 +68,10 @@ export function connectPresence(
   });
 
   socket.addEventListener("error", () => onError());
+
+  watch(() => useAuthStore().accessToken, (token) => {
+    if (token) identify();
+  });
 
   return socket;
 }

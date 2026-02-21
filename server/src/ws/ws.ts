@@ -22,27 +22,41 @@ export function attachPresenceServer(server: HttpServer, prisma: PrismaClient) {
   }
 
   async function sendOnlineSnapshot() {
-    const userIds = Array.from(online.values())
-      .map((entry) => entry.userId)
+    const entries = Array.from(online.entries());
+
+    const userIds = entries
+      .map((e) => e[1].userId)
+      .filter((id): id is number => typeof id === "number" && Number.isFinite(id));
+    const trackIds = entries
+      .map((e) => e[1].trackId)
       .filter((id): id is number => typeof id === "number" && Number.isFinite(id));
 
-    const uniqueIds = Array.from(new Set(userIds));
-    const users = uniqueIds.length
-      ? await prisma.user.findMany({
-          where: { id: { in: uniqueIds } },
-          select: { id: true, email: true, name: true, avatar: true }
-        })
-      : [];
+    const [users, tracks] = await Promise.all([
+      userIds.length
+        ? prisma.user.findMany({
+            where: { id: { in: Array.from(new Set(userIds)) } },
+            select: { id: true, email: true, name: true, avatar: true }
+          })
+        : [],
+      trackIds.length
+        ? prisma.track.findMany({
+            where: { id: { in: Array.from(new Set(trackIds)) } },
+            select: { id: true, title: true, artist: true, coverKey: true }
+          })
+        : []
+    ]);
 
-    const userMap = new Map(users.map((user) => [user.id, user]));
+    const userMap = new Map(users.map((u) => [u.id, u]));
+    const trackMap = new Map(tracks.map((t) => [t.id, t]));
 
     broadcast({
       type: "online_snapshot",
       count: online.size,
-      users: Array.from(online.entries()).map(([id, data]) => ({
+      users: entries.map(([id, data]) => ({
         id: data.userId ?? id,
         trackId: data.trackId ?? null,
-        profile: data.userId ? userMap.get(data.userId) ?? null : null
+        profile: data.userId ? userMap.get(data.userId) ?? null : null,
+        track: data.trackId ? trackMap.get(data.trackId) ?? null : null
       }))
     });
   }
@@ -73,6 +87,8 @@ export function attachPresenceServer(server: HttpServer, prisma: PrismaClient) {
             const userId = Number(payload.sub);
             entry.userId = Number.isFinite(userId) ? userId : null;
             scheduleSnapshot();
+          } else {
+            console.warn("[WS] identify failed – invalid or expired token");
           }
         }
         if (data?.type === "now_playing") {

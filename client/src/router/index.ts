@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
 import FavoritesView from "@/views/FavoritesView.vue";
 import UploadView from "@/views/UploadView.vue";
+import OnlineView from "@/views/OnlineView.vue";
 
 const routes = [
   {
@@ -18,6 +19,11 @@ const routes = [
     path: "/upload",
     name: "upload",
     component: UploadView
+  },
+  {
+    path: "/online",
+    name: "online",
+    component: OnlineView
   }
 ];
 

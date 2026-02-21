@@ -12,14 +12,20 @@
       <router-link to="/upload" class="nav-link" :class="{ active: route.path === '/upload' }">
         [Upload]
       </router-link>
+      <span class="sep">|</span>
+      <router-link to="/online" class="nav-link" :class="{ active: route.path === '/online' }">
+        [Online {{ presence.count }}]
+      </router-link>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
+import { usePresenceStore } from "@/stores/presence";
 
 const route = useRoute();
+const presence = usePresenceStore();
 </script>
 
 <style scoped>
