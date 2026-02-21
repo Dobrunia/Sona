@@ -272,6 +272,7 @@ function togglePlay() {
 
 .title-cell {
   position: static;
+  padding-left: var(--s-md);
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;

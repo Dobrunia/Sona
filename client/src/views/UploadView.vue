@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h2>:: Upload</h2>
+    <h2>Upload</h2>
     <p class="subtitle">Add your track to the catalog.</p>
     <hr class="groove" />
     <upload-form />

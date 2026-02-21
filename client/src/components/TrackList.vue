@@ -87,6 +87,10 @@ provide("trackList", toRef(props, "tracks"));
   padding-right: 0;
 }
 
+.table .th-title {
+  padding-left: var(--s-md);
+}
+
 .th-actions {
   width: 1%;
 }

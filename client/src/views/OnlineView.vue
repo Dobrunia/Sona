@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h2>:: Online Users</h2>
+    <h2>Online Users</h2>
     <p class="subtitle">{{ presence.count }} user(s) connected right now.</p>
     <hr class="groove" />
 

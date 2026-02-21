@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h2>:: Feed</h2>
+    <h2>Feed</h2>
     <p class="subtitle">Latest uploads from the community.</p>
     <hr class="groove" />
     <search-bar @update="setSearch" />

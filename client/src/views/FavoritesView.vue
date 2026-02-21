@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h2>:: Favorites</h2>
+    <h2>Favorites</h2>
     <p class="subtitle">Tracks you liked.</p>
     <hr class="groove" />
     <track-list :tracks="items" :loading="loading" :error="Boolean(error)" />

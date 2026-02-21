@@ -79,7 +79,7 @@ async function logout() {
 .icon {
   width: 16px;
   height: 16px;
-  filter: brightness(10);
+  filter: brightness(0) invert(1);
 }
 
 .controls {
