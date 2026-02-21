@@ -70,6 +70,7 @@ export const usePlayerStore = defineStore("player", {
   state: () => ({
     current: null as Track | null,
     isPlaying: false,
+    repeat: false,
     progress: 0,
     volume: 0.8,
     streamUrl: null as string | null
@@ -95,6 +96,9 @@ export const usePlayerStore = defineStore("player", {
     },
     setVolume(value: number) {
       this.volume = Math.min(Math.max(value, 0), 1);
+    },
+    toggleRepeat() {
+      this.repeat = !this.repeat;
     }
   }
 });

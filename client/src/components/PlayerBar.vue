@@ -25,6 +25,12 @@
           <button class="win-btn" @click="player.toggle" :disabled="!current">
             {{ player.isPlaying ? '||' : '>' }}
           </button>
+          <button
+            class="win-btn sm"
+            :class="{ active: player.repeat }"
+            @click="player.toggleRepeat"
+            title="Repeat track"
+          >↻</button>
         </div>
 
         <div class="sliders">
@@ -116,7 +122,14 @@ onMounted(() => {
     if (!audioEl.value || !audioEl.value.duration) return;
     player.setProgress(audioEl.value.currentTime / audioEl.value.duration);
   });
-  audioEl.value.addEventListener("ended", () => { player.toggle(); });
+  audioEl.value.addEventListener("ended", () => {
+    if (player.repeat && audioEl.value) {
+      audioEl.value.currentTime = 0;
+      audioEl.value.play();
+    } else {
+      player.toggle();
+    }
+  });
 });
 </script>
 
@@ -247,6 +260,8 @@ onMounted(() => {
 
 .controls {
   flex-shrink: 0;
+  display: flex;
+  gap: 4px;
 }
 
 .win-btn {
@@ -269,6 +284,17 @@ onMounted(() => {
 .win-btn:disabled {
   color: #808080;
   cursor: default;
+}
+
+.win-btn.sm {
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+}
+
+.win-btn.active {
+  border: var(--border-sunken);
+  background: var(--c-window);
 }
 
 .sliders {
