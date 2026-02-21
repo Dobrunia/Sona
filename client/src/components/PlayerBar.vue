@@ -140,14 +140,14 @@ onMounted(() => {
   right: 0;
   bottom: var(--nav-h);
   z-index: 15;
-  padding: 0 var(--s-sm);
   display: flex;
   justify-content: center;
+  padding: 0 var(--s-md);
 }
 
 .window {
   width: 100%;
-  max-width: var(--col-width);
+  max-width: calc(var(--col-width) - var(--s-md) * 2);
   background: var(--c-surface);
   border: var(--border-raised);
 }
