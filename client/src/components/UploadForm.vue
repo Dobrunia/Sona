@@ -103,9 +103,21 @@ function formatBytes(value: number) {
   return `${mb.toFixed(2)} MB`;
 }
 
+function parseFilename(name: string): { title: string; artist: string } {
+  const stem = name.replace(/\.[^.]+$/, "").trim();
+  const clean = stem.replace(/^\(?(\d{1,3})\)?\s*[.\-–—]?\s*/, "").trim();
+  const m = clean.match(/^(.+?)\s*[-–—]\s*(.+)$/);
+  if (m) return { artist: m[1].trim(), title: m[2].trim() };
+  return { title: clean, artist: "" };
+}
+
 function onAudioPick(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0];
-  if (file) audioFile.value = file;
+  if (!file) return;
+  audioFile.value = file;
+  const parsed = parseFilename(file.name);
+  if (!form.value.title) form.value.title = parsed.title;
+  if (!form.value.artist) form.value.artist = parsed.artist;
 }
 
 function onCoverPick(event: Event) {

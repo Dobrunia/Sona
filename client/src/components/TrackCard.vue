@@ -9,11 +9,11 @@
         <div class="hole"></div>
       </div>
     </td>
-    <td class="cell title-cell">
-      <canvas v-if="isThisPlaying" ref="eqCanvas" class="eq-canvas" />
-      {{ track.title }}
+    <td class="cell title-cell">{{ track.title }}</td>
+    <td class="cell artist-cell">
+      <canvas v-if="isThisCurrent" ref="eqCanvas" class="eq-canvas" />
+      {{ track.artist || "Unknown" }}
     </td>
-    <td class="cell artist-cell">{{ track.artist || "Unknown" }}</td>
     <td class="cell actions-cell">
       <a href="#" class="link" @click.stop.prevent="toggleLike">
         {{ liked ? '[Unlike]' : '[Like]' }}
@@ -26,7 +26,7 @@
 import { computed, ref, watch, onBeforeUnmount } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import type { Track } from "@/stores/player";
-import { usePlayerStore, getFreqBars } from "@/stores/player";
+import { usePlayerStore, getFreqBars, isAnalyserSilent } from "@/stores/player";
 import { TOGGLE_LIKE } from "@/graphql/mutations";
 import { useToastStore } from "@/stores/toast";
 import { useAuthStore } from "@/stores/auth";
@@ -40,16 +40,21 @@ const auth = useAuthStore();
 const localLiked = ref<boolean | null>(null);
 const eqCanvas = ref<HTMLCanvasElement | null>(null);
 let rafId = 0;
+let drawing = false;
 
 const isThisPlaying = computed(
   () => player.current?.id === props.track.id && player.isPlaying
 );
 
+const isThisCurrent = computed(
+  () => player.current?.id === props.track.id
+);
+
 function drawEq() {
   const canvas = eqCanvas.value;
-  if (!canvas) return;
+  if (!canvas) { drawing = false; return; }
   const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  if (!ctx) { drawing = false; return; }
 
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
@@ -65,28 +70,40 @@ function drawEq() {
   const gap = 1;
   const barW = (w - gap * (bars.length - 1)) / bars.length;
 
-  ctx.fillStyle = "currentcolor";
   const style = getComputedStyle(canvas);
   ctx.fillStyle = style.color;
 
   for (let i = 0; i < bars.length; i++) {
-    const barH = Math.max(1, bars[i] * h);
+    const v = bars[i];
+    if (v < 0.003) continue;
+    const barH = v * h;
     const x = i * (barW + gap);
     ctx.fillRect(x, h - barH, barW, barH);
+  }
+
+  if (!isThisPlaying.value && isAnalyserSilent()) {
+    drawing = false;
+    return;
   }
 
   rafId = requestAnimationFrame(drawEq);
 }
 
+function startDrawing() {
+  if (drawing) return;
+  drawing = true;
+  rafId = requestAnimationFrame(drawEq);
+}
+
 watch(isThisPlaying, (active) => {
-  if (active) {
-    rafId = requestAnimationFrame(drawEq);
-  } else {
-    cancelAnimationFrame(rafId);
-  }
+  if (active) startDrawing();
 });
 
-onBeforeUnmount(() => cancelAnimationFrame(rafId));
+watch(isThisCurrent, (current) => {
+  if (current && isThisPlaying.value) startDrawing();
+});
+
+onBeforeUnmount(() => { drawing = false; cancelAnimationFrame(rafId); });
 
 const liked = computed(() => {
   if (localLiked.value !== null) return localLiked.value;
@@ -260,14 +277,15 @@ function togglePlay() {
 }
 
 .artist-cell {
+  position: relative;
   color: var(--c-muted);
 }
 
 .eq-canvas {
   position: absolute;
   top: 0;
-  left: 500px;
-  right: 60px;
+  right: 0;
+  width: 40%;
   height: 100%;
   opacity: 0.15;
   pointer-events: none;

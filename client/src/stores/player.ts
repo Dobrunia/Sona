@@ -12,13 +12,15 @@ export type Track = {
   likedByMe?: boolean | null;
 };
 
-const BAR_COUNT = 24;
+const BAR_COUNT = 32;
+const DECAY = 0.92;
 
 let audioCtx: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
 let source: MediaElementAudioSourceNode | null = null;
 let connectedEl: HTMLAudioElement | null = null;
-const freqData = new Uint8Array(64);
+let rawFreq: Uint8Array<ArrayBuffer>;
+const smoothBars = new Float32Array(BAR_COUNT);
 
 export function connectAnalyser(el: HTMLAudioElement) {
   if (connectedEl === el) return;
@@ -26,22 +28,42 @@ export function connectAnalyser(el: HTMLAudioElement) {
   if (source) source.disconnect();
   source = audioCtx.createMediaElementSource(el);
   analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 128;
-  analyser.smoothingTimeConstant = 0.7;
+  analyser.fftSize = 512;
+  analyser.smoothingTimeConstant = 0.75;
+  analyser.minDecibels = -90;
+  analyser.maxDecibels = -10;
+  rawFreq = new Uint8Array(analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
   connectedEl = el;
 }
 
-export function getFreqBars(): number[] {
-  if (!analyser) return Array(BAR_COUNT).fill(0);
-  analyser.getByteFrequencyData(freqData);
-  const bars: number[] = [];
-  const step = Math.floor(freqData.length / BAR_COUNT);
-  for (let i = 0; i < BAR_COUNT; i++) {
-    bars.push(freqData[i * step] / 255);
+export function getFreqBars(): Float32Array {
+  if (!analyser) {
+    for (let i = 0; i < BAR_COUNT; i++) smoothBars[i] *= DECAY;
+    return smoothBars;
   }
-  return bars;
+
+  analyser.getByteFrequencyData(rawFreq);
+  const bins = rawFreq.length;
+
+  for (let i = 0; i < BAR_COUNT; i++) {
+    const lo = Math.floor((i / BAR_COUNT) ** 1.5 * bins);
+    const hi = Math.max(lo + 1, Math.floor(((i + 1) / BAR_COUNT) ** 1.5 * bins));
+    let sum = 0;
+    for (let j = lo; j < hi; j++) sum += rawFreq[j];
+    const raw = (sum / (hi - lo)) / 255;
+    smoothBars[i] = Math.max(raw, smoothBars[i] * DECAY);
+  }
+
+  return smoothBars;
+}
+
+export function isAnalyserSilent(): boolean {
+  for (let i = 0; i < BAR_COUNT; i++) {
+    if (smoothBars[i] > 0.005) return false;
+  }
+  return true;
 }
 
 export const usePlayerStore = defineStore("player", {
