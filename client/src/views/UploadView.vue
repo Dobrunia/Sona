@@ -4,11 +4,14 @@
     <p class="subtitle">Add your track to the catalog.</p>
     <hr class="groove" />
     <upload-form />
+    <br />
+    <my-tracks />
   </section>
 </template>
 
 <script setup lang="ts">
 import UploadForm from "@/components/UploadForm.vue";
+import MyTracks from "@/components/MyTracks.vue";
 </script>
 
 <style scoped>

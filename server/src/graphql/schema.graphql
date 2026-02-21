@@ -85,6 +85,7 @@ type Query {
   tracks(search: String, page: Int = 1, pageSize: Int = 10): TrackConnection!
   favorites(page: Int = 1, pageSize: Int = 20): TrackConnection!
   streamUrl(trackId: ID!): String!
+  myTracks(page: Int = 1, pageSize: Int = 10): TrackConnection!
 }
 
 type Mutation {
@@ -94,6 +95,7 @@ type Mutation {
 
   requestTrackUpload(input: TrackUploadRequestInput!): TrackUploadPayload!
   createTrack(input: CreateTrackInput!): Track!
+  deleteTrack(trackId: ID!): Boolean!
 
   toggleLike(trackId: ID!): Boolean!
   incrementPlayCount(trackId: ID!): Track!

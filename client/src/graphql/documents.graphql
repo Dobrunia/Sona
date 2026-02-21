@@ -64,6 +64,28 @@ mutation ToggleLike($trackId: ID!) {
   toggleLike(trackId: $trackId)
 }
 
+query MyTracks($page: Int, $pageSize: Int) {
+  myTracks(page: $page, pageSize: $pageSize) {
+    items {
+      id
+      title
+      artist
+      duration
+      coverUrl
+    }
+    pageInfo {
+      page
+      pageSize
+      total
+      hasNextPage
+    }
+  }
+}
+
+mutation DeleteTrack($trackId: ID!) {
+  deleteTrack(trackId: $trackId)
+}
+
 mutation LoginWithGoogle($idToken: String!) {
   loginWithGoogle(idToken: $idToken) {
     accessToken

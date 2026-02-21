@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import type { GraphQLContext } from "../auth/context.js";
 import { config } from "../core/config.js";
 import { assertAudio, assertCover, assertDuration, assertNumberMatch } from "../core/validation.js";
-import { createUploadUrl, createStreamUrl, headObject } from "../storage/storage.js";
+import { createUploadUrl, createStreamUrl, headObject, deleteObject } from "../storage/storage.js";
 import { issueTokens, verifyGoogleIdToken, hashToken } from "../auth/auth.js";
 import { assertUploadRate } from "../rate-limit/rateLimit.js";
 import { probeDurationSeconds } from "../media/media.js";
@@ -98,6 +98,7 @@ export const typeDefs = /* GraphQL */ `
     tracks(search: String, page: Int = 1, pageSize: Int = 10): TrackConnection!
     favorites(page: Int = 1, pageSize: Int = 20): TrackConnection!
     streamUrl(trackId: ID!): String!
+    myTracks(page: Int = 1, pageSize: Int = 10): TrackConnection!
   }
 
   type Mutation {
@@ -108,6 +109,7 @@ export const typeDefs = /* GraphQL */ `
     requestTrackUpload(input: TrackUploadRequestInput!): TrackUploadPayload!
     createTrack(input: CreateTrackInput!): Track!
 
+    deleteTrack(trackId: ID!): Boolean!
     toggleLike(trackId: ID!): Boolean!
     incrementPlayCount(trackId: ID!): Track!
   }
@@ -237,6 +239,32 @@ export const resolvers = {
       if (!track) throw notFound("Track not found");
       const result = await createStreamUrl(track.fileKey);
       return result.url;
+    },
+    myTracks: async (
+      _: unknown,
+      args: { page?: number; pageSize?: number },
+      ctx: GraphQLContext
+    ) => {
+      const user = requireUser(ctx);
+      const page = Math.max(args.page ?? 1, 1);
+      const pageSize = Math.min(Math.max(args.pageSize ?? 10, 1), 50);
+      const where = { uploadedById: user.id };
+
+      const [items, total] = await Promise.all([
+        ctx.prisma.track.findMany({
+          where,
+          include: { uploadedBy: true },
+          orderBy: { createdAt: "desc" },
+          skip: (page - 1) * pageSize,
+          take: pageSize
+        }),
+        ctx.prisma.track.count({ where })
+      ]);
+
+      return {
+        items,
+        pageInfo: { page, pageSize, total, hasNextPage: page * pageSize < total }
+      };
     }
   },
   Mutation: {
@@ -305,6 +333,25 @@ export const resolvers = {
           data: { revokedAt: new Date() }
         });
       }
+
+      return true;
+    },
+    deleteTrack: async (
+      _: unknown,
+      args: { trackId: string },
+      ctx: GraphQLContext
+    ) => {
+      const user = requireUser(ctx);
+      const trackId = Number(args.trackId);
+      const track = await ctx.prisma.track.findUnique({ where: { id: trackId } });
+      if (!track) throw notFound("Track not found");
+      if (track.uploadedById !== user.id) throw forbidden("Not your track");
+
+      await ctx.prisma.like.deleteMany({ where: { trackId } });
+      await ctx.prisma.track.delete({ where: { id: trackId } });
+
+      await deleteObject(track.fileKey).catch(() => {});
+      if (track.coverKey) await deleteObject(track.coverKey).catch(() => {});
 
       return true;
     },
@@ -440,6 +487,9 @@ export const resolvers = {
       const user = requireUser(ctx);
       const trackId = Number(args.trackId);
 
+      const track = await ctx.prisma.track.findUnique({ where: { id: trackId } });
+      if (!track) throw notFound("Track not found");
+
       const existing = await ctx.prisma.like.findUnique({
         where: { userId_trackId: { userId: user.id, trackId } }
       });
@@ -464,6 +514,11 @@ export const resolvers = {
       ctx: GraphQLContext
     ) => {
       const trackId = Number(args.trackId);
+      const track = await ctx.prisma.track.findUnique({
+        where: { id: trackId },
+        include: { uploadedBy: true }
+      });
+      if (!track) throw notFound("Track not found");
       return ctx.prisma.track.update({
         where: { id: trackId },
         data: { playCount: { increment: 1 } },
