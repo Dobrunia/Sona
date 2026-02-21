@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onBeforeUnmount } from "vue";
+import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import type { Track } from "@/stores/player";
 import { usePlayerStore, getFreqBars, isAnalyserSilent } from "@/stores/player";
@@ -95,12 +95,12 @@ function startDrawing() {
   rafId = requestAnimationFrame(drawEq);
 }
 
-watch(isThisPlaying, (active) => {
-  if (active) startDrawing();
+onMounted(() => {
+  if (isThisPlaying.value) startDrawing();
 });
 
-watch(isThisCurrent, (current) => {
-  if (current && isThisPlaying.value) startDrawing();
+watch(isThisPlaying, (active) => {
+  if (active) startDrawing();
 });
 
 onBeforeUnmount(() => { drawing = false; cancelAnimationFrame(rafId); });
