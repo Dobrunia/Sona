@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { usePlayerStore } from "@/stores/player";
+import { usePlayerStore, connectAnalyser } from "@/stores/player";
 
 const player = usePlayerStore();
 const current = computed(() => player.current);
@@ -110,6 +110,8 @@ watch(
 onMounted(() => {
   if (!audioEl.value) return;
   audioEl.value.volume = player.volume;
+  audioEl.value.crossOrigin = "anonymous";
+  connectAnalyser(audioEl.value);
   audioEl.value.addEventListener("timeupdate", () => {
     if (!audioEl.value || !audioEl.value.duration) return;
     player.setProgress(audioEl.value.currentTime / audioEl.value.duration);

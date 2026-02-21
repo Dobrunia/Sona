@@ -1,5 +1,5 @@
 <template>
-  <tr class="row" @dblclick="play">
+  <tr class="row" :class="{ active: isThisPlaying }" @click="togglePlay">
     <td class="cell cover-cell">
       <div class="vinyl" :class="{ spinning: isThisPlaying }">
         <div class="grooves"></div>
@@ -10,24 +10,23 @@
       </div>
     </td>
     <td class="cell title-cell">
-      <a href="#" class="track-link" @click.prevent="play">{{ track.title }}</a>
+      <canvas v-if="isThisPlaying" ref="eqCanvas" class="eq-canvas" />
+      {{ track.title }}
     </td>
     <td class="cell artist-cell">{{ track.artist || "Unknown" }}</td>
     <td class="cell actions-cell">
-      <a href="#" class="link" @click.prevent="toggleLike">
+      <a href="#" class="link" @click.stop.prevent="toggleLike">
         {{ liked ? '[Unlike]' : '[Like]' }}
       </a>
-      &nbsp;
-      <a href="#" class="link" @click.prevent="play">[Play]</a>
     </td>
   </tr>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch, onBeforeUnmount } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import type { Track } from "@/stores/player";
-import { usePlayerStore } from "@/stores/player";
+import { usePlayerStore, getFreqBars } from "@/stores/player";
 import { TOGGLE_LIKE } from "@/graphql/mutations";
 import { useToastStore } from "@/stores/toast";
 import { useAuthStore } from "@/stores/auth";
@@ -39,10 +38,55 @@ const player = usePlayerStore();
 const toast = useToastStore();
 const auth = useAuthStore();
 const localLiked = ref<boolean | null>(null);
+const eqCanvas = ref<HTMLCanvasElement | null>(null);
+let rafId = 0;
 
 const isThisPlaying = computed(
   () => player.current?.id === props.track.id && player.isPlaying
 );
+
+function drawEq() {
+  const canvas = eqCanvas.value;
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  const w = rect.width;
+  const h = rect.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const bars = getFreqBars();
+  const gap = 1;
+  const barW = (w - gap * (bars.length - 1)) / bars.length;
+
+  ctx.fillStyle = "currentcolor";
+  const style = getComputedStyle(canvas);
+  ctx.fillStyle = style.color;
+
+  for (let i = 0; i < bars.length; i++) {
+    const barH = Math.max(1, bars[i] * h);
+    const x = i * (barW + gap);
+    ctx.fillRect(x, h - barH, barW, barH);
+  }
+
+  rafId = requestAnimationFrame(drawEq);
+}
+
+watch(isThisPlaying, (active) => {
+  if (active) {
+    rafId = requestAnimationFrame(drawEq);
+  } else {
+    cancelAnimationFrame(rafId);
+  }
+});
+
+onBeforeUnmount(() => cancelAnimationFrame(rafId));
 
 const liked = computed(() => {
   if (localLiked.value !== null) return localLiked.value;
@@ -102,19 +146,28 @@ async function toggleLike() {
   }
 }
 
-function play() {
-  player.play(props.track);
+function togglePlay() {
+  if (player.current?.id === props.track.id) {
+    player.toggle();
+  } else {
+    player.play(props.track);
+  }
 }
 </script>
 
 <style scoped>
+.row {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
 .row:hover {
   background: var(--c-highlight);
   color: var(--c-white);
 }
 
-.row:hover .link,
-.row:hover .track-link {
+.row:hover .link {
   color: var(--c-white);
 }
 
@@ -132,6 +185,7 @@ function play() {
 
 .cover-cell {
   width: 36px;
+  padding-right: 0;
 }
 
 .vinyl {
@@ -198,19 +252,27 @@ function play() {
 }
 
 .title-cell {
+  position: static;
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.track-link {
-  color: var(--c-link);
-  text-decoration: underline;
-  cursor: pointer;
+  font-weight: bold;
 }
 
 .artist-cell {
   color: var(--c-muted);
+}
+
+.eq-canvas {
+  position: absolute;
+  top: 0;
+  left: 500px;
+  right: 60px;
+  height: 100%;
+  opacity: 0.15;
+  pointer-events: none;
+  color: currentColor;
+  z-index: 0;
 }
 
 .actions-cell {

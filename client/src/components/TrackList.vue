@@ -17,10 +17,10 @@
       <table v-else class="table" cellspacing="0">
         <thead>
           <tr>
-            <th></th>
-            <th>Title</th>
-            <th>Artist</th>
-            <th></th>
+            <th class="th-cover"></th>
+            <th class="th-title">Title</th>
+            <th class="th-artist">Artist</th>
+            <th class="th-actions"></th>
           </tr>
         </thead>
         <tbody>
@@ -78,5 +78,14 @@ defineProps<{ tracks: Track[]; loading?: boolean; error?: boolean }>();
   font-weight: bold;
   background: var(--c-surface);
   color: var(--c-text);
+}
+
+.th-cover {
+  width: 36px;
+  padding-right: 0;
+}
+
+.th-actions {
+  width: 1%;
 }
 </style>
