@@ -22,9 +22,11 @@
         </div>
 
         <div class="controls">
+          <button class="win-btn sm" @click="player.prev" :disabled="!player.hasPrev" title="Previous">«</button>
           <button class="win-btn" @click="player.toggle" :disabled="!current">
             {{ player.isPlaying ? '||' : '>' }}
           </button>
+          <button class="win-btn sm" @click="player.next" :disabled="!player.hasNext" title="Next">»</button>
           <button
             class="win-btn sm"
             :class="{ active: player.repeat }"
@@ -126,6 +128,8 @@ onMounted(() => {
     if (player.repeat && audioEl.value) {
       audioEl.value.currentTime = 0;
       audioEl.value.play();
+    } else if (player.hasNext) {
+      player.next();
     } else {
       player.toggle();
     }

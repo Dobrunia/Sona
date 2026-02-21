@@ -33,12 +33,14 @@
 </template>
 
 <script setup lang="ts">
+import { provide, toRef } from "vue";
 import TrackCard from "@/components/TrackCard.vue";
 import TrackSkeleton from "@/components/TrackSkeleton.vue";
 import StateBlock from "@/components/StateBlock.vue";
 import type { Track } from "@/stores/player";
 
-defineProps<{ tracks: Track[]; loading?: boolean; error?: boolean }>();
+const props = defineProps<{ tracks: Track[]; loading?: boolean; error?: boolean }>();
+provide("trackList", toRef(props, "tracks"));
 </script>
 
 <style scoped>

@@ -69,14 +69,31 @@ export function isAnalyserSilent(): boolean {
 export const usePlayerStore = defineStore("player", {
   state: () => ({
     current: null as Track | null,
+    queue: [] as Track[],
     isPlaying: false,
     repeat: false,
     progress: 0,
     volume: 0.8,
     streamUrl: null as string | null
   }),
+  getters: {
+    currentIndex(): number {
+      if (!this.current) return -1;
+      return this.queue.findIndex((t) => t.id === this.current!.id);
+    },
+    hasNext(): boolean {
+      return this.currentIndex < this.queue.length - 1;
+    },
+    hasPrev(): boolean {
+      return this.currentIndex > 0;
+    }
+  },
   actions: {
-    async play(track: Track) {
+    setQueue(tracks: Track[]) {
+      this.queue = tracks;
+    },
+    async play(track: Track, tracks?: Track[]) {
+      if (tracks) this.queue = tracks;
       if (audioCtx?.state === "suspended") audioCtx.resume();
       this.current = track;
       const { data } = await apolloClient.query<StreamUrlQuery, StreamUrlQueryVariables>({
@@ -86,6 +103,14 @@ export const usePlayerStore = defineStore("player", {
       });
       this.streamUrl = data?.streamUrl ?? null;
       this.isPlaying = true;
+    },
+    async next() {
+      if (!this.hasNext) return;
+      await this.play(this.queue[this.currentIndex + 1]);
+    },
+    async prev() {
+      if (!this.hasPrev) return;
+      await this.play(this.queue[this.currentIndex - 1]);
     },
     toggle() {
       if (audioCtx?.state === "suspended") audioCtx.resume();

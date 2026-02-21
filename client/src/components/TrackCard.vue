@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { computed, ref, watch, inject, onMounted, onBeforeUnmount } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import type { Track } from "@/stores/player";
 import { usePlayerStore, getFreqBars, isAnalyserSilent } from "@/stores/player";
@@ -35,6 +35,7 @@ import type { ToggleLikeMutation, ToggleLikeMutationVariables } from "@/graphql/
 
 const props = defineProps<{ track: Track }>();
 const player = usePlayerStore();
+const trackList = inject<{ value: Track[] }>("trackList", { value: [] });
 const toast = useToastStore();
 const auth = useAuthStore();
 const localLiked = ref<boolean | null>(null);
@@ -164,6 +165,7 @@ async function toggleLike() {
 }
 
 function togglePlay() {
+  player.setQueue(trackList.value);
   if (player.current?.id === props.track.id) {
     player.toggle();
   } else {
