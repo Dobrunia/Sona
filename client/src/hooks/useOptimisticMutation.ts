@@ -10,7 +10,7 @@ type OptimisticOptions<TData> = {
 };
 
 export function useOptimisticMutation<TVars, TData>(
-  mutate: (vars: TVars, options?: Record<string, unknown>) => Promise<{ data?: TData } | null>
+  mutate: (vars: TVars, options?: Record<string, unknown>) => Promise<{ data?: TData | null } | null>
 ) {
   const refresh = useRefreshStore();
 

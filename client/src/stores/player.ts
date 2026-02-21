@@ -4,7 +4,7 @@ import { STREAM_URL_QUERY } from "@/graphql/queries";
 import type { StreamUrlQuery, StreamUrlQueryVariables } from "@/graphql/generated";
 
 export type Track = {
-  id: number;
+  id: number | string;
   title: string;
   artist?: string | null;
   duration?: number | null;

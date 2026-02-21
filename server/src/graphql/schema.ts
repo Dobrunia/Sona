@@ -8,7 +8,7 @@ import { issueTokens, verifyGoogleIdToken, hashToken } from "../auth/auth.js";
 import { assertUploadRate } from "../rate-limit/rateLimit.js";
 import { probeDurationSeconds } from "../media/media.js";
 import { forbidden, internalError, notFound, unauthenticated } from "../core/errors.js";
-import type { Resolvers } from "./generated.js";
+
 
 export const typeDefs = /* GraphQL */ `
   scalar DateTime
@@ -152,7 +152,7 @@ async function safeHead(key: string) {
   }
 }
 
-export const resolvers: Resolvers = {
+export const resolvers = {
   DateTime: DateTimeScalar,
   Query: {
     health: () => "ok",
